@@ -26,20 +26,14 @@ export default function AdminPortal() {
   const [loginError, setLoginError] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  // Restore session on mount
+  // Restore session on mount and fetch guests if already logged in
   useEffect(() => {
     const session = sessionStorage.getItem('admin_session');
     if (session === 'active') {
       setIsLoggedIn(true);
-    }
-  }, []);
-
-  // Fetch guests data when logged in
-  useEffect(() => {
-    if (isLoggedIn) {
       fetchGuests();
     }
-  }, [isLoggedIn, fetchGuests]);
+  }, [fetchGuests]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +50,7 @@ export default function AdminPortal() {
       const data = await res.json();
       if (res.ok && data.success) {
         setIsLoggedIn(true);
+        fetchGuests();
         // Save local session
         sessionStorage.setItem('admin_session', 'active');
       } else {
@@ -81,13 +76,13 @@ export default function AdminPortal() {
       <div className="min-h-screen flex items-center justify-center p-4 bg-candi-cream selection:bg-candi-gold/20">
         <div className="w-full max-w-md bg-candi-white rounded-2xl shadow-xl border border-candi-gold-light/60 p-6 md:p-8 animate-fade-in">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-candi-cream rounded-full border-2 border-candi-gold-light/80 shadow-inner mb-3">
-              <svg viewBox="0 0 100 100" className="w-9 h-9 fill-candi-gold">
+            <div className="inline-flex items-center justify-center size-16 bg-candi-cream rounded-full border-2 border-candi-gold-light/80 shadow-inner mb-3">
+              <svg viewBox="0 0 100 100" className="size-9 fill-candi-gold">
                 <path d="M50 15 L57 25 H43 L50 15 Z M50 25 L65 40 H35 L50 25 Z M50 40 L72 65 H28 L50 40 Z M33 65 H67 V90 H33 V65 Z" stroke="currentColor" strokeWidth="2.5" fill="none" />
                 <rect x="44" y="73" width="12" height="17" rx="1" stroke="currentColor" strokeWidth="2" fill="none" />
               </svg>
             </div>
-            <h1 className="font-serif text-2xl font-bold tracking-wide text-candi-charcoal">LOGIN ADMINISTRATOR</h1>
+            <h1 className="font-serif text-2xl font-semibold tracking-wide text-candi-charcoal">LOGIN ADMINISTRATOR</h1>
             <p className="text-xs font-semibold tracking-widest text-candi-gold uppercase mt-0.5">Buku Tamu Candi Dadi</p>
             <div className="w-16 h-0.5 bg-candi-gold/30 mx-auto mt-2"></div>
           </div>
@@ -113,7 +108,7 @@ export default function AdminPortal() {
                   className="w-full py-3.5 pl-11 pr-4 bg-candi-cream/30 border border-candi-gold-light hover:border-candi-gold/60 rounded-xl text-sm"
                   required
                 />
-                <Lock className="w-4 h-4 text-candi-muted absolute left-4 top-4" />
+                <Lock className="size-4 text-candi-muted absolute left-4 top-4" />
               </div>
             </div>
 
@@ -140,14 +135,14 @@ export default function AdminPortal() {
       <header className="bg-candi-white border-b border-candi-gold-light py-4 px-6 md:px-8 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-candi-cream rounded-xl flex items-center justify-center border border-candi-gold-light/80 shadow-sm">
-              <svg viewBox="0 0 100 100" className="w-7 h-7 fill-candi-gold">
+            <div className="size-12 bg-candi-cream rounded-xl flex items-center justify-center border border-candi-gold-light/80 shadow-sm">
+              <svg viewBox="0 0 100 100" className="size-7 fill-candi-gold">
                 <path d="M50 15 L57 25 H43 L50 15 Z M50 25 L65 40 H35 L50 25 Z M50 40 L72 65 H28 L50 40 Z M33 65 H67 V90 H33 V65 Z" stroke="currentColor" strokeWidth="2.5" fill="none" />
                 <rect x="44" y="73" width="12" height="17" rx="1" stroke="currentColor" strokeWidth="2" fill="none" />
               </svg>
             </div>
             <div>
-              <h1 className="font-serif text-xl md:text-2xl font-bold tracking-wide text-candi-charcoal leading-tight">
+              <h1 className="font-serif text-xl md:text-2xl font-semibold tracking-wide text-candi-charcoal leading-tight">
                 PANEL ADMIN - CANDI DADI
               </h1>
               <p className="text-xs font-semibold text-candi-muted tracking-wider">
@@ -159,7 +154,7 @@ export default function AdminPortal() {
             onClick={handleLogout}
             className="px-4 py-2 border border-stone-200 hover:border-candi-gold hover:text-candi-gold text-candi-charcoal text-sm font-semibold rounded-lg transition duration-150 flex items-center gap-2 cursor-pointer bg-candi-white font-sans"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="size-4" />
             <span>Keluar</span>
           </button>
         </div>
@@ -178,7 +173,7 @@ export default function AdminPortal() {
                   : 'border-transparent text-candi-muted hover:text-candi-charcoal hover:border-stone-300'
               }`}
             >
-              <BookOpen className="w-4.5 h-4.5" />
+              <BookOpen className="size-4.5" />
               <span>Daftar Pengunjung</span>
             </button>
 
@@ -190,7 +185,7 @@ export default function AdminPortal() {
                   : 'border-transparent text-candi-muted hover:text-candi-charcoal hover:border-stone-300'
               }`}
             >
-              <QrCode className="w-4.5 h-4.5" />
+              <QrCode className="size-4.5" />
               <span>QR Code</span>
             </button>
 
@@ -202,7 +197,7 @@ export default function AdminPortal() {
                   : 'border-transparent text-candi-muted hover:text-candi-charcoal hover:border-stone-300'
               }`}
             >
-              <KeyRound className="w-4.5 h-4.5" />
+              <KeyRound className="size-4.5" />
               <span>Pengaturan</span>
             </button>
           </nav>

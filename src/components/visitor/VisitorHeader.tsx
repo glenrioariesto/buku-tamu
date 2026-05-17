@@ -12,7 +12,7 @@ export default function VisitorHeader() {
         <div className="flex-1 h-px bg-gradient-to-r from-candi-gold-light to-transparent max-w-[70px]"></div>
       </div>
       <h1 
-        className="font-serif font-bold tracking-[2px]" 
+        className="font-serif font-semibold tracking-[2px]" 
         style={{
           fontSize: 'clamp(24px, 6vw, 42px)',
           background: 'linear-gradient(135deg, var(--color-candi-charcoal) 0%, var(--color-candi-gold) 50%, var(--color-candi-gold-dark) 100%)',

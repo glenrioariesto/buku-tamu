@@ -11,9 +11,11 @@ export default function StatCards() {
   const totalGuests = guests.length;
   
   const todayGuests = guests.filter((g) => {
-    const today = new Date().toDateString();
-    const guestDate = new Date(g.createdAt).toDateString();
-    return today === guestDate;
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+    const d = new Date(g.createdAt);
+    const guestStr = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    return todayStr === guestStr;
   }).length;
 
   const personalGuests = guests.filter((g) => g.type === 'personal').length;

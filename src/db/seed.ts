@@ -21,14 +21,16 @@ async function seed() {
     { key: 'allowed_radius_meters', value: '200' }
   ];
 
-  for (const s of defaultSettings) {
-    await db.insert(schema.settings)
-      .values(s)
-      .onConflictDoUpdate({
-        target: schema.settings.key,
-        set: { value: s.value, updatedAt: new Date() }
-      });
-  }
+  await Promise.all(
+    defaultSettings.map(s =>
+      db.insert(schema.settings)
+        .values(s)
+        .onConflictDoUpdate({
+          target: schema.settings.key,
+          set: { value: s.value, updatedAt: new Date() }
+        })
+    )
+  );
   
   // 2. Seed dummy guests
   console.log('📋 Seeding visitor entries...');

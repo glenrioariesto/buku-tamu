@@ -17,7 +17,7 @@ export default function SuccessCard({ name, onReset }: SuccessCardProps) {
       ></div>
 
       <div className="text-[52px] mb-3.5 leading-none">🏛️</div>
-      <h2 className="font-serif text-[22px] text-tamu-moss mb-2 font-bold">Terima Kasih!</h2>
+      <h2 className="font-serif text-[22px] text-tamu-moss mb-2 font-semibold">Terima Kasih!</h2>
       <p className="text-[14px] text-candi-muted leading-[1.7]">
         Kunjungan Anda ke <strong>Candi Dadi</strong> telah tercatat.<br/>
         Semoga perjalanan Anda menyenangkan dan penuh makna.

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import QRCode from 'qrcode';
 import { useAdminStore } from '@/store/useAdminStore';
 import { 
@@ -39,19 +40,23 @@ export default function TabPanels() {
   const [gpsError, setGpsError] = useState('');
 
   // Fetch current GPS settings on settings tab activation
+  const fetchGpsSettings = () => {
+    fetch('/api/auth')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setGpsLockEnabled(data.gps_lock_enabled);
+          setCandiLatitude(data.candi_latitude);
+          setCandiLongitude(data.candi_longitude);
+          setAllowedRadiusMeters(data.allowed_radius_meters);
+        }
+      })
+      .catch((err) => console.error('Failed to load GPS settings:', err));
+  };
+
   useEffect(() => {
     if (activeTab === 'pengaturan') {
-      fetch('/api/auth')
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            setGpsLockEnabled(data.gps_lock_enabled);
-            setCandiLatitude(data.candi_latitude);
-            setCandiLongitude(data.candi_longitude);
-            setAllowedRadiusMeters(data.allowed_radius_meters);
-          }
-        })
-        .catch((err) => console.error('Failed to load GPS settings:', err));
+      fetchGpsSettings();
     }
   }, [activeTab]);
 
@@ -172,8 +177,8 @@ export default function TabPanels() {
       {/* Tab Content 2: QR CODE TAB */}
       {activeTab === 'qr' && (
         <div className="bg-candi-white rounded-2xl shadow-sm border border-candi-gold-light/60 p-6 md:p-8 animate-fade-in max-w-4xl mx-auto">
-          <h2 className="font-serif text-xl font-bold text-candi-charcoal mb-4 flex items-center gap-2">
-            <QrCode className="w-5.5 h-5.5 text-candi-gold" />
+          <h2 className="font-serif text-xl font-semibold text-candi-charcoal mb-4 flex items-center gap-2">
+            <QrCode className="size-5.5 text-candi-gold" />
             <span>Konfigurasi & Generate QR Code</span>
           </h2>
           <p className="text-sm text-candi-muted mb-6 leading-relaxed">
@@ -186,8 +191,7 @@ export default function TabPanels() {
               {qrImage ? (
                 <div className="flex flex-col items-center">
                   <div className="p-4 bg-white rounded-xl shadow-md border border-stone-200">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={qrImage} alt="QR Code Candi Dadi" className="w-56 h-56 object-contain" />
+                    <Image src={qrImage} alt="QR Code Candi Dadi" width={224} height={224} className="size-56 object-contain" unoptimized />
                   </div>
                   <span className="text-xs font-bold text-candi-gold mt-4 uppercase tracking-widest">
                     Buku Tamu Candi Dadi
@@ -228,7 +232,7 @@ export default function TabPanels() {
                   download="QR_Code_Buku_Tamu_Candi_Dadi.png"
                   className="px-5 py-3.5 bg-candi-gold hover:bg-candi-gold-dark text-white text-sm font-bold rounded-xl transition duration-150 shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer flex-1 text-center font-sans"
                 >
-                  <Download className="w-4.5 h-4.5" />
+                  <Download className="size-4.5" />
                   <span>Unduh Gambar PNG</span>
                 </a>
 
@@ -256,8 +260,8 @@ export default function TabPanels() {
           {/* Card 1: Kata Sandi (Left Column) */}
           <div className="bg-candi-white rounded-2xl shadow-sm border border-candi-gold-light/60 p-6 md:p-8 flex flex-col justify-between">
             <div>
-              <h2 className="font-serif text-xl font-bold text-candi-charcoal mb-4 flex items-center gap-2">
-                <KeyRound className="w-5.5 h-5.5 text-candi-gold" />
+              <h2 className="font-serif text-xl font-semibold text-candi-charcoal mb-4 flex items-center gap-2">
+                <KeyRound className="size-5.5 text-candi-gold" />
                 <span>Pengaturan Kata Sandi</span>
               </h2>
               <p className="text-xs text-candi-muted mb-6 leading-relaxed">
@@ -267,7 +271,7 @@ export default function TabPanels() {
               <form onSubmit={handleChangePassword} className="space-y-5">
                 {settingsSuccess && (
                   <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-xs text-green-700 font-bold flex items-center gap-1.5 animate-fade-in">
-                    <Check className="w-4 h-4 text-green-600 shrink-0" />
+                    <Check className="size-4 text-green-600 shrink-0" />
                     <span>{settingsSuccess}</span>
                   </div>
                 )}
@@ -341,8 +345,8 @@ export default function TabPanels() {
           {/* Card 2: GPS Geofencing (Right Column) */}
           <div className="bg-candi-white rounded-2xl shadow-sm border border-candi-gold-light/60 p-6 md:p-8 flex flex-col justify-between">
             <div>
-              <h2 className="font-serif text-xl font-bold text-candi-charcoal mb-4 flex items-center gap-2">
-                <MapPin className="w-5.5 h-5.5 text-candi-gold" />
+              <h2 className="font-serif text-xl font-semibold text-candi-charcoal mb-4 flex items-center gap-2">
+                <MapPin className="size-5.5 text-candi-gold" />
                 <span>Pengatur Lokasi & Geofencing GPS</span>
               </h2>
               <p className="text-xs text-candi-muted mb-6 leading-relaxed">
@@ -352,7 +356,7 @@ export default function TabPanels() {
               <form onSubmit={handleUpdateGPS} className="space-y-5">
                 {gpsSuccess && (
                   <div className="p-3 bg-green-50 border border-green-200 rounded-xl text-xs text-green-700 font-bold flex items-center gap-1.5 animate-fade-in">
-                    <Check className="w-4 h-4 text-green-600 shrink-0" />
+                    <Check className="size-4 text-green-600 shrink-0" />
                     <span>{gpsSuccess}</span>
                   </div>
                 )}
@@ -369,8 +373,9 @@ export default function TabPanels() {
                     <span className="text-sm font-bold text-candi-charcoal block">Aktifkan Kunci GPS</span>
                     <span className="text-[10px] text-candi-muted block mt-0.5">Wajibkan pengunjung share GPS handphone untuk check-in.</span>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label htmlFor="gps_toggle" className="relative inline-flex items-center cursor-pointer" aria-label="Toggle GPS lock">
                     <input 
+                      id="gps_toggle"
                       type="checkbox" 
                       checked={gpsLockEnabled}
                       onChange={(e) => setGpsLockEnabled(e.target.checked)}
@@ -383,7 +388,7 @@ export default function TabPanels() {
                 {/* Coordinate Grid inputs */}
                 <div>
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl flex gap-3 mb-4">
-                    <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+                    <Info className="size-5 text-blue-500 shrink-0 mt-0.5" />
                     <p className="text-[10px] text-blue-700 leading-relaxed font-medium">
                       <strong className="block mb-0.5">Titik Lokasi Monumen Absolut</strong>
                       Koordinat di bawah ini adalah titik lokasi fisik candi/cagar budaya (didapat dari Google Maps), <b>bukan</b> lokasi HP admin saat ini. Sistem mengukur jarak pengunjung ke titik ini.

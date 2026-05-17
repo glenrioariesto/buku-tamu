@@ -73,7 +73,7 @@ export default function CustomSelect({
         <span className={`block truncate mr-2 ${selectedOption ? 'text-[#2c2416]' : 'text-candi-muted'}`}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronDown className={`w-4 h-4 text-candi-gold transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`size-4 text-candi-gold transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Dropdown Menu Options Panel */}
@@ -106,7 +106,7 @@ export default function CustomSelect({
                   }`}
                 >
                   <span className="truncate">{opt.label}</span>
-                  {isSelected && <Check className="w-4 h-4 text-candi-gold shrink-0 ml-2" />}
+                  {isSelected && <Check className="size-4 text-candi-gold shrink-0 ml-2" />}
                 </button>
               );
             })

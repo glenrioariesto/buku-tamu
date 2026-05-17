@@ -31,6 +31,12 @@ export default function VisitorTable() {
   const deleteGuest = useAdminStore((s) => s.deleteGuest);
   const editGuest = useAdminStore((s) => s.editGuest);
 
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    });
+  };
+
   // Dynamic regional location data from the dynamic JSON database
   const [provinces, setProvinces] = useState<{ id: string; name: string }[]>([]);
 
@@ -42,20 +48,19 @@ export default function VisitorTable() {
       .join(' ');
   };
 
-  useEffect(() => {
-    async function loadProvinces() {
-      try {
-        const res = await fetch('/api/provinces.json');
-        if (res.ok) {
-          const data = await res.json();
-          setProvinces(data);
-        }
-      } catch (err) {
-        console.error('Failed to load provinces:', err);
+  const fetchProvincesData = async () => {
+    try {
+      const res = await fetch('/api/provinces.json');
+      if (res.ok) {
+        const data = await res.json();
+        setProvinces(data);
       }
+    } catch (err) {
+      console.error('Failed to load provinces:', err);
     }
-    loadProvinces();
-  }, []);
+  };
+
+
 
   // States for CRUD modals
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
@@ -145,6 +150,7 @@ export default function VisitorTable() {
     setEditOrgMembers(guest.orgMembers ? String(guest.orgMembers) : '');
     setEditOrgPosition(guest.orgPosition || '');
     setIsEditModalOpen(true);
+    fetchProvincesData();
   };
 
   // Submit Edit Guest
@@ -201,7 +207,7 @@ export default function VisitorTable() {
             className="px-4 py-2.5 bg-candi-white hover:bg-candi-cream border border-stone-200 hover:border-candi-gold text-candi-charcoal hover:text-candi-gold text-sm font-semibold rounded-xl transition duration-150 flex items-center gap-2 cursor-pointer shadow-sm"
             disabled={isLoading}
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`size-4 ${isLoading ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
 
@@ -210,7 +216,7 @@ export default function VisitorTable() {
             disabled={filteredGuests.length === 0}
             className="px-4 py-2.5 bg-candi-white hover:bg-candi-cream border border-stone-200 hover:border-candi-gold text-candi-charcoal hover:text-candi-gold text-sm font-semibold rounded-xl transition duration-150 flex items-center gap-2 cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Download className="w-4 h-4" />
+            <Download className="size-4" />
             <span>Export CSV</span>
           </button>
         </div>
@@ -225,7 +231,7 @@ export default function VisitorTable() {
               placeholder="Cari nama, kota, organisasi..."
               className="w-full py-2.5 pl-10 pr-4 bg-candi-white border border-stone-200 rounded-xl text-sm"
             />
-            <Search className="w-4 h-4 text-candi-muted absolute left-3.5 top-3.5" />
+            <Search className="size-4 text-candi-muted absolute left-3.5 top-3.5" />
           </div>
           <div className="bg-candi-gold text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0">
             {filteredGuests.length} Pengunjung
@@ -239,14 +245,14 @@ export default function VisitorTable() {
           <table className="w-full text-left border-collapse text-sm">
             <thead>
               <tr className="bg-candi-cream/55 border-b border-candi-gold-light/65 text-candi-muted font-bold text-xs uppercase tracking-wider">
-                <th className="py-4 px-4 w-12 text-center">#</th>
-                <th className="py-4 px-4">Pengunjung</th>
-                <th className="py-4 px-4">Asal Daerah</th>
-                <th className="py-4 px-4">Tujuan</th>
-                <th className="py-4 px-4">Kesan</th>
-                <th className="py-4 px-4 w-28 text-center">Rating</th>
-                <th className="py-4 px-4 w-36">Waktu</th>
-                <th className="py-4 px-4 w-24 text-center">Aksi</th>
+                <th className="p-4 w-12 text-center">#</th>
+                <th className="p-4">Pengunjung</th>
+                <th className="p-4">Asal Daerah</th>
+                <th className="p-4">Tujuan</th>
+                <th className="p-4">Kesan</th>
+                <th className="p-4 w-28 text-center">Rating</th>
+                <th className="p-4 w-36">Waktu</th>
+                <th className="p-4 w-24 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
@@ -254,7 +260,7 @@ export default function VisitorTable() {
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-candi-muted font-medium">
                     <div className="flex flex-col items-center gap-3">
-                      <RefreshCw className="w-8 h-8 animate-spin text-candi-gold" />
+                      <RefreshCw className="size-8 animate-spin text-candi-gold" />
                       <span>Memuat data dari database…</span>
                     </div>
                   </td>
@@ -263,8 +269,8 @@ export default function VisitorTable() {
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-candi-muted">
                     <div className="flex flex-col items-center gap-4">
-                      <div className="w-16 h-16 bg-candi-cream rounded-full flex items-center justify-center border border-candi-gold-light">
-                        <svg viewBox="0 0 100 100" className="w-8 h-8 fill-candi-gold/60">
+                      <div className="size-16 bg-candi-cream rounded-full flex items-center justify-center border border-candi-gold-light">
+                        <svg viewBox="0 0 100 100" className="size-8 fill-candi-gold/60">
                           <path d="M50 15 L57 25 H43 L50 15 Z M50 25 L65 40 H35 L50 25 Z M50 40 L72 65 H28 L50 40 Z M33 65 H67 V90 H33 V65 Z" stroke="currentColor" strokeWidth="2.5" fill="none" />
                         </svg>
                       </div>
@@ -275,10 +281,10 @@ export default function VisitorTable() {
               ) : (
                 filteredGuests.map((guest, index) => (
                   <tr key={guest.id} className="hover:bg-candi-cream/15 transition duration-150">
-                    <td className="py-4 px-4 text-center font-semibold text-candi-muted">
+                    <td className="p-4 text-center font-semibold text-candi-muted">
                       {index + 1}
                     </td>
-                    <td className="py-4 px-4 font-bold text-candi-charcoal">
+                    <td className="p-4 font-bold text-candi-charcoal">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-1.5">
                           <span>{guest.name}</span>
@@ -292,7 +298,7 @@ export default function VisitorTable() {
                         </div>
                         {guest.type === 'rombongan' && (
                           <div className="flex items-center gap-1 text-xs font-semibold text-candi-gold bg-candi-gold-light/45 py-0.5 px-2 rounded-md w-fit mt-0.5 border border-candi-gold-light/60">
-                            <Building className="w-3 h-3" />
+                            <Building className="size-3" />
                             <span>{guest.orgName} ({guest.orgMembers} org)</span>
                             {guest.orgPosition && (
                               <span className="text-[10px] text-candi-muted ml-1 italic">- {guest.orgPosition}</span>
@@ -301,9 +307,9 @@ export default function VisitorTable() {
                         )}
                       </div>
                     </td>
-                    <td className="py-4 px-4 font-medium">
+                    <td className="p-4 font-medium">
                       <div className="flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-candi-muted shrink-0" />
+                        <MapPin className="size-3.5 text-candi-muted shrink-0" />
                         <span>
                           {guest.city}
                           {guest.province ? `, ${guest.province}` : ''}
@@ -311,20 +317,20 @@ export default function VisitorTable() {
                         </span>
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-candi-charcoal font-medium">
+                    <td className="p-4 text-candi-charcoal font-medium">
                       {guest.visitPurpose || '—'}
                     </td>
-                    <td className="py-4 px-4 text-candi-muted italic max-w-xs truncate" title={guest.impression || ''}>
+                    <td className="p-4 text-candi-muted italic max-w-xs truncate" title={guest.impression || ''}>
                       {guest.impression || '—'}
                     </td>
-                    <td className="py-4 px-4 text-center">
+                    <td className="p-4 text-center">
                       {guest.rating ? (
                         <div className="flex items-center justify-center gap-0.5">
-                          {[...Array(5)].map((_, i) => (
+                          {[1, 2, 3, 4, 5].map((starVal) => (
                             <Star
-                              key={i}
-                              className={`w-3.5 h-3.5 ${
-                                i < (guest.rating || 0)
+                              key={`star-${guest.id}-${starVal}`}
+                              className={`size-3.5 ${
+                                starVal <= (guest.rating || 0)
                                   ? 'fill-candi-gold text-candi-gold'
                                   : 'text-stone-200'
                               }`}
@@ -335,16 +341,10 @@ export default function VisitorTable() {
                         <span className="text-stone-300">-</span>
                       )}
                     </td>
-                    <td suppressHydrationWarning className="py-4 px-4 text-candi-muted font-medium text-xs">
-                      {new Date(guest.createdAt).toLocaleString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
+                    <td className="p-4 text-candi-muted font-medium text-xs" suppressHydrationWarning>
+                      {guest.createdAt ? formatDate(guest.createdAt) : '-'}
                     </td>
-                    <td className="py-4 px-4 text-center">
+                    <td className="p-4 text-center">
                       <div className="flex items-center justify-center gap-2">
                         {/* Edit Action Button */}
                         <button
@@ -352,7 +352,7 @@ export default function VisitorTable() {
                           className="p-1.5 hover:bg-candi-gold-light/40 border border-transparent hover:border-candi-gold-light rounded-lg text-candi-muted hover:text-candi-gold transition duration-150 cursor-pointer"
                           title="Edit data tamu"
                         >
-                          <Edit3 className="w-4 h-4" />
+                          <Edit3 className="size-4" />
                         </button>
 
                         {/* Delete Action Button */}
@@ -361,7 +361,7 @@ export default function VisitorTable() {
                           className="p-1.5 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-lg text-candi-muted hover:text-red-500 transition duration-150 cursor-pointer"
                           title="Hapus data tamu"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="size-4" />
                         </button>
                       </div>
                     </td>
@@ -375,27 +375,27 @@ export default function VisitorTable() {
 
       {/* EDIT VISITOR DETAILS MODAL */}
       {isEditModalOpen && editingGuest && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto animate-fade-in">
-          <div className="w-full max-w-lg bg-candi-white rounded-2xl shadow-2xl border border-candi-gold-light p-6 max-h-[90vh] overflow-y-auto space-y-5">
+        <div role="presentation" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in" onClick={() => { setIsEditModalOpen(false); setEditingGuest(null); }} onKeyDown={(e) => { if (e.key === 'Escape') { setIsEditModalOpen(false); setEditingGuest(null); } }}>
+          <div role="dialog" aria-modal="true" aria-label="Ubah Data Kunjungan" tabIndex={-1} className="w-full max-w-lg bg-candi-white rounded-2xl shadow-2xl border border-candi-gold-light p-6 max-h-[90vh] overflow-y-auto space-y-5" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => { if (e.key === 'Escape') { setIsEditModalOpen(false); setEditingGuest(null); } }}>
             <div className="flex items-center justify-between border-b border-stone-100 pb-3">
-              <h3 className="font-serif text-lg font-bold text-candi-charcoal flex items-center gap-2">
-                <Edit3 className="w-5 h-5 text-candi-gold" />
+              <h3 className="font-serif text-lg font-semibold text-candi-charcoal flex items-center gap-2">
+                <Edit3 className="size-5 text-candi-gold" />
                 <span>Ubah Data Kunjungan</span>
               </h3>
               <button
                 onClick={() => { setIsEditModalOpen(false); setEditingGuest(null); }}
                 className="p-1 hover:bg-candi-cream rounded-lg text-candi-muted hover:text-candi-charcoal cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="size-5" />
               </button>
             </div>
 
             <form onSubmit={handleEditSubmit} className="space-y-4">
               {/* Name */}
               <div>
-                <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                   Nama Lengkap
-                </label>
+                </div>
                 <input
                   type="text"
                   value={editName}
@@ -409,9 +409,9 @@ export default function VisitorTable() {
               {editingGuest.type === 'rombongan' && (
                 <div className="p-3.5 bg-candi-gold-light/15 border border-candi-gold-light/40 rounded-xl space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                    <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                       Nama Instansi / Rombongan
-                    </label>
+                    </div>
                     <input
                       type="text"
                       value={editOrgName}
@@ -422,9 +422,9 @@ export default function VisitorTable() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                      <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                         Jumlah Anggota
-                      </label>
+                      </div>
                       <input
                         type="number"
                         min="1"
@@ -435,9 +435,9 @@ export default function VisitorTable() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                      <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                         Jabatan
-                      </label>
+                      </div>
                       <input
                         type="text"
                         value={editOrgPosition}
@@ -452,9 +452,9 @@ export default function VisitorTable() {
               {/* City and Province */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                  <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                     Asal Kota / Kabupaten
-                  </label>
+                  </div>
                   <input
                     type="text"
                     value={editCity}
@@ -464,9 +464,9 @@ export default function VisitorTable() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                  <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                     Provinsi
-                  </label>
+                  </div>
                   <select
                     value={editProvince}
                     onChange={(e) => setEditProvince(e.target.value)}
@@ -488,9 +488,9 @@ export default function VisitorTable() {
               {/* Country and Phone */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                  <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                     Negara
-                  </label>
+                  </div>
                   <input
                     type="text"
                     value={editCountry}
@@ -499,9 +499,9 @@ export default function VisitorTable() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                  <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                     No. HP / WA
-                  </label>
+                  </div>
                   <input
                     type="tel"
                     value={editPhone}
@@ -514,9 +514,9 @@ export default function VisitorTable() {
               {/* Gender and Purpose */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                  <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                     Jenis Kelamin
-                  </label>
+                  </div>
                   <select
                     value={editGender}
                     onChange={(e) => setEditGender(e.target.value)}
@@ -528,9 +528,9 @@ export default function VisitorTable() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                  <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                     Tujuan Kunjungan
-                  </label>
+                  </div>
                   <select
                     value={editVisitPurpose}
                     onChange={(e) => setEditVisitPurpose(e.target.value)}
@@ -546,9 +546,9 @@ export default function VisitorTable() {
 
               {/* Rating */}
               <div>
-                <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                   Rating Bintang
-                </label>
+                </div>
                 <div className="flex items-center gap-1.5">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -558,7 +558,7 @@ export default function VisitorTable() {
                       className="p-1 cursor-pointer hover:scale-110 transition duration-75"
                     >
                       <Star
-                        className={`w-6 h-6 ${
+                        className={`size-6 ${
                           star <= editRating
                             ? 'fill-candi-gold text-candi-gold'
                             : 'text-stone-200'
@@ -574,9 +574,9 @@ export default function VisitorTable() {
 
               {/* Impression */}
               <div>
-                <label className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                   Kesan & Pesan
-                </label>
+                </div>
                 <textarea
                   rows={2}
                   value={editImpression}
@@ -609,7 +609,7 @@ export default function VisitorTable() {
       {isDeleteConfirmOpen !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-fade-in">
           <div className="w-full max-w-sm bg-candi-white rounded-2xl shadow-xl border border-red-150 p-6 space-y-4">
-            <h3 className="font-serif text-lg font-bold text-red-600">Hapus Entri Tamu?</h3>
+            <h3 className="font-serif text-lg font-semibold text-red-600">Hapus Entri Tamu?</h3>
             <p className="text-sm text-candi-muted leading-relaxed">
               Tindakan ini permanen. Seluruh data kunjungan untuk tamu terpilih akan dihapus selamanya dari database SQLite lokal Candi Dadi.
             </p>

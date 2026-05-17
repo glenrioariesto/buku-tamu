@@ -46,7 +46,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
   const [orgPosition, setOrgPosition] = useState('');
 
   const [hoverRating, setHoverRating] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   // GPS Geofencing Lock states
@@ -76,23 +76,24 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
   };
 
   // Load provinces static database
-  useEffect(() => {
-    async function loadProvinces() {
-      try {
-        const res = await fetch('/api/provinces.json');
-        if (res.ok) {
-          const data = await res.json();
-          setProvinces(data);
-        }
-      } catch (err) {
-        console.error('Failed to load provinces:', err);
+  const fetchProvincesConfig = async () => {
+    try {
+      const res = await fetch('/api/provinces.json');
+      if (res.ok) {
+        const data = await res.json();
+        setProvinces(data);
       }
+    } catch (err) {
+      console.error('Failed to load provinces:', err);
     }
-    loadProvinces();
+  };
+
+  useEffect(() => {
+    fetchProvincesConfig();
   }, []);
 
   // Fetch active GPS geofencing rules from DB anonymously
-  useEffect(() => {
+  const fetchGpsRules = () => {
     fetch('/api/auth')
       .then((res) => res.json())
       .then((data) => {
@@ -106,26 +107,31 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
         }
       })
       .catch((err) => console.error('Failed to load GPS config:', err));
+  };
+
+  useEffect(() => {
+    fetchGpsRules();
   }, []);
 
   // Load regencies dynamically
+  const fetchRegenciesConfig = async (provId: string) => {
+    try {
+      const res = await fetch(`/api/regencies/${provId}.json`);
+      if (res.ok) {
+        const data = await res.json();
+        setRegencies(data);
+      }
+    } catch (err) {
+      console.error('Failed to load regencies:', err);
+    }
+  };
+
   useEffect(() => {
     if (!selectedProvinceId) {
       setRegencies([]);
       return;
     }
-    async function loadRegencies() {
-      try {
-        const res = await fetch(`/api/regencies/${selectedProvinceId}.json`);
-        if (res.ok) {
-          const data = await res.json();
-          setRegencies(data);
-        }
-      } catch (err) {
-        console.error('Failed to load regencies:', err);
-      }
-    }
-    loadRegencies();
+    fetchRegenciesConfig(selectedProvinceId);
   }, [selectedProvinceId]);
 
   // Haversine formula to compute distance in meters between user and temple
@@ -204,7 +210,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
       setGpsChecking(false);
     }
 
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     try {
       const payload = {
@@ -241,7 +247,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
       console.error(err);
       setErrorMessage('Koneksi internet bermasalah. Silakan coba lagi.');
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -256,10 +262,10 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
       {/* Geofencing Verification Overlay Loader */}
       {gpsChecking && (
         <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center p-6 text-center z-25 animate-fade-in">
-          <div className="w-16 h-16 rounded-full bg-[#f7f0e2] flex items-center justify-center border border-candi-gold/30 animate-pulse mb-4">
-            <MapPin className="w-8 h-8 text-candi-gold animate-bounce" />
+          <div className="size-16 rounded-full bg-[#f7f0e2] flex items-center justify-center border border-candi-gold/30 animate-pulse mb-4">
+            <MapPin className="size-8 text-candi-gold" />
           </div>
-          <h4 className="font-serif text-lg font-bold text-candi-charcoal">Memverifikasi Lokasi GPS Anda…</h4>
+          <h4 className="font-serif text-lg font-semibold text-candi-charcoal">Memverifikasi Lokasi GPS Anda…</h4>
           <p className="text-xs text-candi-muted mt-2 max-w-xs leading-relaxed">
             Sistem sedang memastikan koordinat GPS Anda berada dalam area cagar budaya Candi Dadi demi keaslian data kunjungan.
           </p>
@@ -309,7 +315,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
         {gpsLockError && (
           <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-bold flex flex-col gap-2 animate-fade-in mb-4">
             <div className="flex items-start gap-2.5">
-              <MapPin className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+              <MapPin className="size-5 text-red-600 shrink-0 mt-0.5" />
               <span>{gpsLockError}</span>
             </div>
           </div>
@@ -432,7 +438,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
                     setSelectedProvinceId('');
                   }
                 }}
-                className="w-[15px] h-[15px] cursor-pointer accent-[#b8841a]"
+                className="size-[15px] cursor-pointer accent-[#b8841a]"
               />
               <span className="text-[13px] text-[#5a4a30] font-medium">Berasal dari luar negeri?</span>
             </label>
@@ -535,7 +541,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
             />
           </div>
           <div className="tamu-field">
-            <label>Penilaian</label>
+            <div className="block text-[11px] font-semibold uppercase tracking-[1.2px] text-[#9a8468] mb-[8px]" role="group" aria-label="Penilaian">Penilaian</div>
             <div className="flex gap-2 flex-wrap">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -563,10 +569,10 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isSubmitting}
           className="tamu-btn-submit"
         >
-          {isLoading ? 'MENGIRIM…' : <>🏛️ &nbsp;Kirim Buku Tamu</>}
+          {isSubmitting ? 'MENGIRIM…' : <>🏛️ &nbsp;Kirim Buku Tamu</>}
         </button>
       </form>
     </div>
