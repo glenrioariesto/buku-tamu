@@ -42,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${dmSans.variable} ${cinzel.variable} ${crimsonPro.variable}`}>
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/logo.webp" type="image/webp" />
       </head>
       <body className="antialiased">
         {children}

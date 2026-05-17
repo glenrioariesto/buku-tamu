@@ -28,7 +28,8 @@ export default function GuestBookPage() {
       {/* Footer */}
       <footer className="text-center py-5 text-[11px] text-tamu-stone-lt tracking-[0.5px] mt-2">
         <p suppressHydrationWarning>© {new Date().getFullYear()} Candi Dadi. All rights reserved.</p>
-        <p className="mt-1">Pemerintah Kabupaten Tulungagung - Balai Pelestarian Kebudayaan</p>
+        <p className="mt-1 font-semibold uppercase tracking-[1px]">Kementerian Kebudayaan</p>
+        <p className="mt-0.5">Balai Pelestarian Kebudayaan Wilayah XI Jawa Timur</p>
       </footer>
     </div>
   );

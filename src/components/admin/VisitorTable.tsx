@@ -449,20 +449,21 @@ export default function VisitorTable() {
                 </div>
               )}
 
-              {/* City and Province */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
-                    Asal Kota / Kabupaten
-                  </div>
-                  <input
-                    type="text"
-                    value={editCity}
-                    onChange={(e) => setEditCity(e.target.value)}
-                    className="w-full py-2.5 px-3 bg-candi-cream/30 border border-candi-gold-light rounded-xl text-sm"
-                    required
-                  />
+              {/* Negara */}
+              <div>
+                <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                  Negara
                 </div>
+                <input
+                  type="text"
+                  value={editCountry}
+                  onChange={(e) => setEditCountry(e.target.value)}
+                  className="w-full py-2.5 px-3 bg-candi-cream/30 border border-candi-gold-light rounded-xl text-sm"
+                />
+              </div>
+
+              {/* Provinsi and Kota */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
                     Provinsi
@@ -483,32 +484,31 @@ export default function VisitorTable() {
                     })}
                   </select>
                 </div>
-              </div>
-
-              {/* Country and Phone */}
-              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
-                    Negara
+                    Asal Kota / Kabupaten
                   </div>
                   <input
                     type="text"
-                    value={editCountry}
-                    onChange={(e) => setEditCountry(e.target.value)}
+                    value={editCity}
+                    onChange={(e) => setEditCity(e.target.value)}
                     className="w-full py-2.5 px-3 bg-candi-cream/30 border border-candi-gold-light rounded-xl text-sm"
+                    required
                   />
                 </div>
-                <div>
-                  <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
-                    No. HP / WA
-                  </div>
-                  <input
-                    type="tel"
-                    value={editPhone}
-                    onChange={(e) => setEditPhone(e.target.value)}
-                    className="w-full py-2.5 px-3 bg-candi-cream/30 border border-candi-gold-light rounded-xl text-sm"
-                  />
+              </div>
+
+              {/* Phone */}
+              <div>
+                <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                  No. HP / WA
                 </div>
+                <input
+                  type="tel"
+                  value={editPhone}
+                  onChange={(e) => setEditPhone(e.target.value)}
+                  className="w-full py-2.5 px-3 bg-candi-cream/30 border border-candi-gold-light rounded-xl text-sm"
+                />
               </div>
 
               {/* Gender and Purpose */}

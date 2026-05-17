@@ -1,11 +1,19 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 
 export default function VisitorHeader() {
   return (
     <header className="text-center pt-11 pb-8 border-b border-tamu-parch3 mb-7">
-      <div className="text-[44px] mb-2.5 leading-none">🏛️</div>
+      <Image 
+        src="/logo.webp" 
+        alt="Logo Candi Dadi" 
+        width={64} 
+        height={64} 
+        className="mx-auto mb-2 rounded-full"
+        priority
+      />
       <div className="flex items-center justify-center gap-3 text-candi-gold text-[11px] tracking-[5px] uppercase mb-2.5 w-full max-w-[350px] mx-auto">
         <div className="flex-1 h-px bg-gradient-to-r from-transparent to-candi-gold-light max-w-[70px]"></div>
         <span>Warisan Budaya Nusantara</span>

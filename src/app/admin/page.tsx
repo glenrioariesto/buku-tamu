@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import { useAdminStore } from '@/store/useAdminStore';
 import StatCards from '@/components/admin/StatCards';
 import VisitorTable from '@/components/admin/VisitorTable';
@@ -76,11 +77,21 @@ export default function AdminPortal() {
       <div className="min-h-screen flex items-center justify-center p-4 bg-candi-cream selection:bg-candi-gold/20">
         <div className="w-full max-w-md bg-candi-white rounded-2xl shadow-xl border border-candi-gold-light/60 p-6 md:p-8 animate-fade-in">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center size-16 bg-candi-cream rounded-full border-2 border-candi-gold-light/80 shadow-inner mb-3">
-              <svg viewBox="0 0 100 100" className="size-9 fill-candi-gold">
-                <path d="M50 15 L57 25 H43 L50 15 Z M50 25 L65 40 H35 L50 25 Z M50 40 L72 65 H28 L50 40 Z M33 65 H67 V90 H33 V65 Z" stroke="currentColor" strokeWidth="2.5" fill="none" />
-                <rect x="44" y="73" width="12" height="17" rx="1" stroke="currentColor" strokeWidth="2" fill="none" />
-              </svg>
+            <div className="flex flex-col items-center justify-center gap-3 mb-4">
+              <Image 
+                src="/logo.webp" 
+                alt="Logo Candi Dadi" 
+                width={80} 
+                height={80} 
+                className="rounded-full shadow-md"
+                priority
+              />
+              <div className="inline-flex items-center justify-center size-12 bg-candi-cream rounded-full border-2 border-candi-gold-light/80 shadow-inner">
+                <svg viewBox="0 0 100 100" className="size-6 fill-candi-gold">
+                  <path d="M50 15 L57 25 H43 L50 15 Z M50 25 L65 40 H35 L50 25 Z M50 40 L72 65 H28 L50 40 Z M33 65 H67 V90 H33 V65 Z" stroke="currentColor" strokeWidth="2.5" fill="none" />
+                  <rect x="44" y="73" width="12" height="17" rx="1" stroke="currentColor" strokeWidth="2" fill="none" />
+                </svg>
+              </div>
             </div>
             <h1 className="font-serif text-2xl font-semibold tracking-wide text-candi-charcoal">LOGIN ADMINISTRATOR</h1>
             <p className="text-xs font-semibold tracking-widest text-candi-gold uppercase mt-0.5">Buku Tamu Candi Dadi</p>
@@ -217,7 +228,9 @@ export default function AdminPortal() {
 
       {/* Footer copyright */}
       <footer suppressHydrationWarning className="py-4 border-t border-candi-gold-light/40 text-center text-xs text-candi-muted font-medium bg-candi-white">
-        © {new Date().getFullYear()} Candi Dadi Panel Admin. All rights reserved.
+        <p>© {new Date().getFullYear()} Candi Dadi Panel Admin. All rights reserved.</p>
+        <p className="mt-1 font-semibold uppercase tracking-[1px]">Kementerian Kebudayaan</p>
+        <p className="mt-0.5">Balai Pelestarian Kebudayaan Wilayah XI Jawa Timur</p>
       </footer>
     </div>
   );
