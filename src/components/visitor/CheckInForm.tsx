@@ -427,7 +427,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
                 checked={country.toLowerCase() !== 'indonesia'}
                 onChange={(e) => {
                   if (e.target.checked) {
-                    setCountry(''); // Kosongkan agar bisa diisi nama negara
+                    setCountry('');
                     setProvince('');
                     setCity('');
                     setSelectedProvinceId('');
@@ -444,7 +444,49 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
             </label>
           </div>
 
+          {country.toLowerCase() !== 'indonesia' && (
+            <div className="tamu-field mb-3">
+              <label htmlFor="country">
+                Negara Asal <span className="tamu-req">*</span>
+              </label>
+              <input
+                type="text"
+                id="country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder="Contoh: Malaysia, Belanda..."
+                className="tamu-input"
+              />
+            </div>
+          )}
+
           <div className="tamu-row2">
+            <div className="tamu-field">
+              <label htmlFor="province">Provinsi</label>
+              {country.toLowerCase() === 'indonesia' ? (
+                <CustomSelect
+                  id="province"
+                  value={selectedProvinceId}
+                  onChange={(val) => {
+                    setSelectedProvinceId(val);
+                    const selectedProv = provinces.find((p) => p.id === val);
+                    setProvince(selectedProv ? toTitleCase(selectedProv.name) : '');
+                    setCity('');
+                  }}
+                  options={provinces.map(prov => ({ value: prov.id, label: toTitleCase(prov.name) }))}
+                  placeholder="-- Pilih --"
+                />
+              ) : (
+                <input
+                  type="text"
+                  id="province"
+                  value={province}
+                  onChange={(e) => setProvince(e.target.value)}
+                  placeholder="Negara Bagian (opsional)"
+                  className="tamu-input"
+                />
+              )}
+            </div>
             <div className="tamu-field">
               <label htmlFor="city">Asal Kota / Kabupaten <span className="tamu-req">*</span></label>
               {country.toLowerCase() === 'indonesia' ? (
@@ -472,49 +514,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
                 />
               )}
             </div>
-            <div className="tamu-field">
-              <label htmlFor="province">Provinsi</label>
-              {country.toLowerCase() === 'indonesia' ? (
-                <CustomSelect
-                  id="province"
-                  value={selectedProvinceId}
-                  onChange={(val) => {
-                    setSelectedProvinceId(val);
-                    const selectedProv = provinces.find((p) => p.id === val);
-                    setProvince(selectedProv ? toTitleCase(selectedProv.name) : '');
-                    setCity('');
-                  }}
-                  options={provinces.map(prov => ({ value: prov.id, label: toTitleCase(prov.name) }))}
-                  placeholder="-- Pilih --"
-                />
-              ) : (
-                <input
-                  type="text"
-                  id="province"
-                  value={province}
-                  onChange={(e) => setProvince(e.target.value)}
-                  placeholder="Negara Bagian (opsional)"
-                  className="tamu-input"
-                />
-              )}
-            </div>
           </div>
-          
-          {country.toLowerCase() !== 'indonesia' && (
-            <div className="tamu-field mt-3">
-              <label htmlFor="country">
-                Negara Asal <span className="tamu-req">*</span>
-              </label>
-              <input
-                type="text"
-                id="country"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                placeholder="Contoh: Malaysia, Belanda..."
-                className="tamu-input"
-              />
-            </div>
-          )}
         </div>
 
         {/* TUJUAN & KESAN */}
