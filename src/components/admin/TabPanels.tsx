@@ -134,7 +134,7 @@ export default function TabPanels() {
                 </div>
               ) : (
                 <div className="h-56 flex items-center justify-center text-candi-muted font-medium">
-                  Membuat QR Code...
+                  Membuat QR Code…
                 </div>
               )}
             </div>
@@ -186,65 +186,7 @@ export default function TabPanels() {
         </div>
       )}
 
-      {/* Tab Content 3: SETUP */}
-      {activeTab === 'setup' && (
-        <div className="bg-candi-white rounded-2xl shadow-sm border border-candi-gold-light/60 p-6 md:p-8 animate-fade-in max-w-4xl mx-auto space-y-6">
-          <h2 className="font-serif text-xl font-bold text-candi-charcoal border-b border-stone-100 pb-3 flex items-center gap-2">
-            <Settings className="w-5.5 h-5.5 text-candi-gold" />
-            <span>Setup & Panduan Sistem</span>
-          </h2>
 
-          <div className="space-y-4 text-sm text-candi-charcoal leading-relaxed">
-            <div className="p-4 bg-candi-gold-light/15 border border-candi-gold-light/40 rounded-xl flex gap-3">
-              <Info className="w-5.5 h-5.5 text-candi-gold shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-bold text-candi-charcoal mb-1">Modern Next.js & Drizzle ORM Migrated</h4>
-                <p className="text-candi-muted">
-                  Sistem ini telah sepenuhnya dimigrasikan dari file statis HTML dan integrasi Apps Script Google Sheets yang rawan CORS/failed-to-fetch ke aplikasi modern Next.js. Data tamu sekarang aman disimpan secara lokal di dalam database relasional SQLite (`candi-dadi.db`).
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-3 pt-2">
-              <h3 className="font-bold text-candi-charcoal text-base">Panduan Pengoperasian & CLI:</h3>
-              
-              <div className="border border-stone-200 rounded-xl overflow-hidden font-mono text-xs">
-                <div className="bg-stone-50 border-b border-stone-200 px-4 py-2 font-bold text-candi-muted uppercase tracking-wider">
-                  CLI Database Commands
-                </div>
-                <div className="p-4 bg-candi-cream/10 space-y-3">
-                  <div>
-                    <span className="text-candi-gold font-bold">1. Push Schema ke Database:</span>
-                    <pre className="bg-stone-900 text-stone-100 p-2.5 rounded-lg mt-1 overflow-x-auto">npm run db:push</pre>
-                    <span className="text-[11px] text-candi-muted mt-1 block">Sinkronisasi struktur schema langsung ke file SQLite tanpa migration manual.</span>
-                  </div>
-
-                  <div>
-                    <span className="text-candi-gold font-bold">2. Seed Data Awal / Dummy Tamu:</span>
-                    <pre className="bg-stone-900 text-stone-100 p-2.5 rounded-lg mt-1 overflow-x-auto">npm run db:seed</pre>
-                    <span className="text-[11px] text-candi-muted mt-1 block">Inisialisasi password admin ke database (`candidad1`) dan tambahkan logs simulasi.</span>
-                  </div>
-
-                  <div>
-                    <span className="text-candi-gold font-bold">3. Buka Visualizer Drizzle Studio:</span>
-                    <pre className="bg-stone-900 text-stone-100 p-2.5 rounded-lg mt-1 overflow-x-auto">npm run db:studio</pre>
-                    <span className="text-[11px] text-candi-muted mt-1 block">Membuka UI browser interaktif untuk melihat, mengedit, dan mengekspor seluruh table database Anda secara visual.</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-2 space-y-2">
-                <h3 className="font-bold text-candi-charcoal text-base">Keuntungan SQLite Lokal:</h3>
-                <ul className="list-disc pl-5 space-y-1.5 text-candi-muted font-medium">
-                  <li>Tidak membutuhkan server database eksternal / cloud berbayar.</li>
-                  <li>Sangat andal, super cepat, dan tidak terhambat CORS browser.</li>
-                  <li>Mudah dibackup: Cukup salin file <code className="bg-candi-cream px-1.5 py-0.5 rounded font-mono text-candi-charcoal text-xs">candi-dadi.db</code> di root project.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Tab Content 4: PENGATURAN */}
       {activeTab === 'pengaturan' && (

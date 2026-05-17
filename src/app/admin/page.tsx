@@ -167,25 +167,6 @@ export default function AdminPortal() {
 
       {/* Main Content Area */}
       <main className="flex-1 py-6 px-4 md:px-8 max-w-7xl w-full mx-auto space-y-6">
-        {/* Status System Connection Banner */}
-        <div className="bg-candi-white rounded-2xl shadow-sm border border-candi-gold-light/60 p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-candi-cream flex items-center justify-center border border-candi-gold/20">
-              <Database className="w-5 h-5 text-candi-gold" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-candi-charcoal">Status Database</h3>
-              <p className="text-xs text-candi-muted flex items-center gap-1.5 mt-0.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
-                <span>Terhubung ke Drizzle ORM (SQLite lokal - `candi-dadi.db`)</span>
-              </p>
-            </div>
-          </div>
-          <div className="text-xs text-candi-muted bg-candi-cream border border-candi-gold-light/40 py-1.5 px-3 rounded-lg font-mono">
-            {guests.length} Entri Tamu Tersimpan
-          </div>
-        </div>
-
         {/* Tab Navigation Menu */}
         <div className="border-b border-stone-200">
           <nav className="flex flex-wrap -mb-px gap-4 sm:gap-6">
@@ -211,18 +192,6 @@ export default function AdminPortal() {
             >
               <QrCode className="w-4.5 h-4.5" />
               <span>QR Code</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('setup')}
-              className={`py-3.5 px-1 border-b-2 font-semibold text-sm transition duration-150 flex items-center gap-2 cursor-pointer ${
-                activeTab === 'setup'
-                  ? 'border-candi-gold text-candi-gold'
-                  : 'border-transparent text-candi-muted hover:text-candi-charcoal hover:border-stone-300'
-              }`}
-            >
-              <Settings className="w-4.5 h-4.5" />
-              <span>Setup</span>
             </button>
 
             <button
@@ -252,7 +221,7 @@ export default function AdminPortal() {
       </main>
 
       {/* Footer copyright */}
-      <footer className="py-4 border-t border-candi-gold-light/40 text-center text-xs text-candi-muted font-medium bg-candi-white">
+      <footer suppressHydrationWarning className="py-4 border-t border-candi-gold-light/40 text-center text-xs text-candi-muted font-medium bg-candi-white">
         © {new Date().getFullYear()} Candi Dadi Panel Admin. All rights reserved.
       </footer>
     </div>
