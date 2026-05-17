@@ -381,36 +381,45 @@ export default function TabPanels() {
                 </div>
 
                 {/* Coordinate Grid inputs */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="latitude" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-                      Latitude (Lintang)
-                    </label>
-                    <input
-                      type="number"
-                      step="any"
-                      id="latitude"
-                      value={candiLatitude}
-                      onChange={(e) => setCandiLatitude(parseFloat(e.target.value))}
-                      placeholder="Contoh: -8.130248"
-                      className="w-full py-3 px-4 bg-candi-cream/30 border border-candi-gold-light hover:border-candi-gold/60 rounded-xl text-sm"
-                      required
-                    />
+                <div>
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl flex gap-3 mb-4">
+                    <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-blue-700 leading-relaxed font-medium">
+                      <strong className="block mb-0.5">Titik Lokasi Monumen Absolut</strong>
+                      Koordinat di bawah ini adalah titik lokasi fisik candi/cagar budaya (didapat dari Google Maps), <b>bukan</b> lokasi HP admin saat ini. Sistem mengukur jarak pengunjung ke titik ini.
+                    </p>
                   </div>
-                  <div>
-                    <label htmlFor="longitude" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-                      Longitude (Bujur)
-                    </label>
-                    <input
-                      type="number"
-                      step="any"
-                      id="longitude"
-                      value={candiLongitude}
-                      onChange={(e) => setCandiLongitude(parseFloat(e.target.value))}
-                      placeholder="Contoh: 111.926823"
-                      className="w-full py-3 px-4 bg-candi-cream/30 border border-candi-gold-light hover:border-candi-gold/60 rounded-xl text-sm"
-                      required
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="latitude" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
+                        Latitude (Lintang)
+                      </label>
+                      <input
+                        type="number"
+                        step="any"
+                        id="latitude"
+                        value={candiLatitude}
+                        onChange={(e) => setCandiLatitude(parseFloat(e.target.value))}
+                        placeholder="Contoh: -8.130248"
+                        className="w-full py-3 px-4 bg-candi-cream/30 border border-candi-gold-light hover:border-candi-gold/60 rounded-xl text-sm"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="longitude" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
+                        Longitude (Bujur)
+                      </label>
+                      <input
+                        type="number"
+                        step="any"
+                        id="longitude"
+                        value={candiLongitude}
+                        onChange={(e) => setCandiLongitude(parseFloat(e.target.value))}
+                        placeholder="Contoh: 111.926823"
+                        className="w-full py-3 px-4 bg-candi-cream/30 border border-candi-gold-light hover:border-candi-gold/60 rounded-xl text-sm"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
 
