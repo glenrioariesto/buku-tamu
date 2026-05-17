@@ -3,9 +3,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 
-interface Option {
+export interface Option {
   value: string;
   label: string;
+  isGroup?: boolean;
 }
 
 interface CustomSelectProps {
@@ -20,6 +21,7 @@ interface CustomSelectProps {
 }
 
 export default function CustomSelect({
+  id,
   value,
   onChange,
   options,
@@ -42,9 +44,10 @@ export default function CustomSelect({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const selectedOption = options.find((opt) => opt.value === value);
+  const selectedOption = options.find((opt) => opt.value === value && !opt.isGroup);
 
-  const handleSelect = (val: string) => {
+  const handleSelect = (val: string, isGroup?: boolean) => {
+    if (isGroup) return; // Cannot select a group header
     onChange(val);
     setIsOpen(false);
   };
@@ -53,46 +56,57 @@ export default function CustomSelect({
     <div ref={containerRef} className={`relative w-full ${className}`}>
       {/* Trigger Button */}
       <button
+        id={id}
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full py-3 pl-4 pr-10 bg-candi-cream/30 border rounded-xl text-sm transition duration-150 text-left cursor-pointer flex items-center justify-between outline-none focus:border-candi-gold focus:ring-1 focus:ring-candi-gold/30 ${
+        className={`w-full py-[11px] px-[13px] bg-white border-[1.5px] rounded-lg text-[14px] font-sans transition-colors duration-200 text-left cursor-pointer flex items-center justify-between outline-none ${
           disabled 
-            ? 'opacity-50 cursor-not-allowed bg-candi-cream/10 border-candi-gold-light/40' 
+            ? 'opacity-60 cursor-not-allowed border-[#ede4ce] bg-[#faf8f5]' 
             : error 
-              ? 'border-red-400 bg-red-50/20' 
-              : 'border-candi-gold-light hover:border-candi-gold/60'
+              ? 'border-[#d35a5a] bg-[#fff8f7]' 
+              : isOpen 
+                ? 'border-candi-gold' 
+                : 'border-[#ede4ce] hover:border-candi-gold/60'
         }`}
       >
-        <span className={`block truncate mr-2 ${selectedOption ? 'text-candi-charcoal font-medium' : 'text-candi-muted'}`}>
+        <span className={`block truncate mr-2 ${selectedOption ? 'text-[#2c2416]' : 'text-candi-muted'}`}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronDown className={`w-4 h-4 text-candi-gold transition duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-candi-gold transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Dropdown Menu Options Panel */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1.5 bg-candi-white border border-candi-gold-light/70 rounded-xl shadow-xl max-h-60 overflow-y-auto animate-fade-in py-1">
+        <div className="absolute z-50 w-full mt-2 bg-white border border-[#ede4ce] rounded-lg shadow-[0_4px_24px_rgba(44,36,22,0.15)] max-h-[300px] overflow-y-auto animate-fade-in py-1.5 font-sans">
           {options.length === 0 ? (
             <div className="px-4 py-3 text-sm text-candi-muted italic text-center">
               Tidak ada pilihan
             </div>
           ) : (
-            options.map((opt) => {
+            options.map((opt, idx) => {
+              if (opt.isGroup) {
+                return (
+                  <div key={`group-${idx}`} className="px-3 pt-3 pb-1.5 text-[11px] font-semibold text-[#9a8468] uppercase tracking-wide">
+                    {opt.label}
+                  </div>
+                );
+              }
+
               const isSelected = opt.value === value;
               return (
                 <button
-                  key={opt.value}
+                  key={`opt-${idx}-${opt.value}`}
                   type="button"
-                  onClick={() => handleSelect(opt.value)}
-                  className={`w-full px-4 py-2.5 text-left text-sm transition duration-100 flex items-center justify-between cursor-pointer ${
+                  onClick={() => handleSelect(opt.value, opt.isGroup)}
+                  className={`w-full px-3 py-2 text-left text-[14px] transition-colors duration-100 flex items-center justify-between cursor-pointer ${
                     isSelected
-                      ? 'bg-candi-gold/10 text-candi-gold font-semibold'
-                      : 'text-candi-charcoal hover:bg-candi-cream/40'
+                      ? 'bg-[#f7f0e2] text-candi-gold font-medium'
+                      : 'text-[#2c2416] hover:bg-[#faf8f5]'
                   }`}
                 >
-                  <span>{opt.label}</span>
-                  {isSelected && <Check className="w-4 h-4 text-candi-gold shrink-0" />}
+                  <span className="truncate">{opt.label}</span>
+                  {isSelected && <Check className="w-4 h-4 text-candi-gold shrink-0 ml-2" />}
                 </button>
               );
             })

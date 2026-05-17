@@ -1,25 +1,27 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  User, 
-  Users, 
-  MapPin, 
-  Building, 
-  Phone, 
-  Star, 
-  Smile, 
-  Heart,
-  HelpCircle,
-  ChevronDown
-} from 'lucide-react';
-import CustomSelect from '@/components/ui/CustomSelect';
+import { MapPin } from 'lucide-react';
+import CustomSelect, { Option } from '@/components/ui/CustomSelect';
 
-const VISIT_PURPOSES = [
-  "Wisata & Rekreasi",
-  "Akademik & Penelitian",
-  "Kedinasan",
-  "Lainnya"
+const VISIT_PURPOSE_OPTIONS: Option[] = [
+  { label: '🌿 Wisata & Rekreasi', value: 'group1', isGroup: true },
+  { label: 'Wisata Edukasi', value: 'Wisata Edukasi' },
+  { label: 'Wisata Keluarga', value: 'Wisata Keluarga' },
+  { label: 'Wisata Budaya & Sejarah', value: 'Wisata Budaya & Sejarah' },
+  { label: 'Fotografi / Dokumentasi', value: 'Fotografi / Dokumentasi' },
+  { label: '🎓 Akademik & Penelitian', value: 'group2', isGroup: true },
+  { label: 'Penelitian Akademik / Skripsi / Tesis', value: 'Penelitian Akademik / Skripsi / Tesis' },
+  { label: 'Kunjungan Sekolah / Studi Tour', value: 'Kunjungan Sekolah / Studi Tour' },
+  { label: 'Penelitian Arkeologi & Sejarah', value: 'Penelitian Arkeologi & Sejarah' },
+  { label: '🏛️ Kedinasan', value: 'group3', isGroup: true },
+  { label: 'Kunjungan Resmi / Kedinasan', value: 'Kunjungan Resmi / Kedinasan' },
+  { label: 'Pemantauan & Monitoring', value: 'Pemantauan & Monitoring' },
+  { label: 'Koordinasi Pengelolaan Cagar Budaya', value: 'Koordinasi Pengelolaan Cagar Budaya' },
+  { label: '✨ Lainnya', value: 'group4', isGroup: true },
+  { label: 'Kegiatan Spiritual / Ziarah Budaya', value: 'Kegiatan Spiritual / Ziarah Budaya' },
+  { label: 'Media / Jurnalistik / Konten', value: 'Media / Jurnalistik / Konten' },
+  { label: 'Lainnya', value: 'Lainnya' }
 ];
 
 interface CheckInFormProps {
@@ -244,11 +246,17 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
   };
 
   return (
-    <div className="bg-candi-white rounded-2xl shadow-xl border border-candi-gold-light/60 p-6 md:p-8 relative overflow-hidden">
+    <div className="bg-white rounded-[14px] shadow-[0_4px_24px_rgba(44,36,22,0.18)] border border-tamu-parch3 p-7 relative overflow-hidden">
+      {/* Top decorative line */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{ background: 'linear-gradient(90deg, var(--color-candi-gold-dark), var(--color-candi-gold), var(--color-candi-gold-light), var(--color-candi-gold), var(--color-candi-gold-dark))' }}
+      ></div>
+
       {/* Geofencing Verification Overlay Loader */}
       {gpsChecking && (
-        <div className="absolute inset-0 bg-candi-white/95 rounded-2xl flex flex-col items-center justify-center p-6 text-center z-25 animate-fade-in">
-          <div className="w-16 h-16 rounded-full bg-candi-cream flex items-center justify-center border border-candi-gold/30 animate-pulse mb-4">
+        <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center p-6 text-center z-25 animate-fade-in">
+          <div className="w-16 h-16 rounded-full bg-[#f7f0e2] flex items-center justify-center border border-candi-gold/30 animate-pulse mb-4">
             <MapPin className="w-8 h-8 text-candi-gold animate-bounce" />
           </div>
           <h4 className="font-serif text-lg font-bold text-candi-charcoal">Memverifikasi Lokasi GPS Anda…</h4>
@@ -257,38 +265,49 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
           </p>
         </div>
       )}
-      {/* Visitor Type Animated Switcher */}
-      <div className="flex bg-candi-cream p-1 rounded-xl mb-6 border border-candi-gold-light/50">
-        <button
-          type="button"
-          onClick={() => { setVisitorType('personal'); setErrorMessage(''); }}
-          className={`flex-1 py-3 text-sm font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer ${
-            visitorType === 'personal'
-              ? 'bg-candi-white text-candi-charcoal shadow-sm border border-candi-gold-light/30'
-              : 'text-candi-muted hover:text-candi-charcoal'
-          }`}
-        >
-          <User className="w-4 h-4 text-candi-gold" />
-          <span>Personal</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => { setVisitorType('rombongan'); setErrorMessage(''); }}
-          className={`flex-1 py-3 text-sm font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2 cursor-pointer ${
-            visitorType === 'rombongan'
-              ? 'bg-candi-white text-candi-charcoal shadow-sm border border-candi-gold-light/30'
-              : 'text-candi-muted hover:text-candi-charcoal'
-          }`}
-        >
-          <Users className="w-4 h-4 text-candi-gold" />
-          <span>Rombongan</span>
-        </button>
+
+      {/* Greeting text */}
+      <p className="font-crimson italic text-candi-muted mb-[22px] whitespace-nowrap text-center tracking-tight text-[11px] min-[400px]:text-[12px] sm:text-[14px] md:text-[15px]">
+        Selamat datang di Candi Dadi. Mohon isi buku tamu sebagai tanda kehadiran Anda. 🙏
+      </p>
+
+      {/* JENIS PENGUNJUNG */}
+      <div className="tamu-section">
+        <div className="tamu-section-title">Jenis Pengunjung</div>
+        
+        {/* Visitor Type Animated Switcher (type-toggle) */}
+        <div className="flex bg-[#f7f0e2] border-[1.5px] border-tamu-parch3 p-1 rounded-[10px] mb-2">
+          <button
+            type="button"
+            onClick={() => { setVisitorType('personal'); setErrorMessage(''); }}
+            className={`flex-1 p-[10px] rounded-[7px] text-[13px] font-medium transition-all duration-200 text-center cursor-pointer ${
+              visitorType === 'personal'
+                ? 'bg-white text-candi-gold shadow-[0_2px_8px_rgba(44,36,22,0.18)]'
+                : 'bg-transparent text-[#9a8468] hover:text-candi-charcoal'
+            }`}
+          >
+            <span className="block text-[22px] mb-[3px] leading-none">🧍</span>
+            <span className="block text-[11px]">Personal</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => { setVisitorType('rombongan'); setErrorMessage(''); }}
+            className={`flex-1 p-[10px] rounded-[7px] text-[13px] font-medium transition-all duration-200 text-center cursor-pointer ${
+              visitorType === 'rombongan'
+                ? 'bg-white text-candi-gold shadow-[0_2px_8px_rgba(44,36,22,0.18)]'
+                : 'bg-transparent text-[#9a8468] hover:text-candi-charcoal'
+            }`}
+          >
+            <span className="block text-[22px] mb-[3px] leading-none">🏢</span>
+            <span className="block text-[11px]">Rombongan / Organisasi</span>
+          </button>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit}>
         {/* GPS Geofencing Lockout Alert */}
         {gpsLockError && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-bold flex flex-col gap-2 animate-fade-in">
+          <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-bold flex flex-col gap-2 animate-fade-in mb-4">
             <div className="flex items-start gap-2.5">
               <MapPin className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
               <span>{gpsLockError}</span>
@@ -298,145 +317,169 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
 
         {/* Error Message banner */}
         {errorMessage && (
-          <div className="p-3.5 bg-red-50 border border-red-200/80 rounded-xl text-sm text-red-600 font-medium animate-pulse">
+          <div className="p-3.5 bg-red-50 border border-red-200/80 rounded-xl text-sm text-red-600 font-medium animate-pulse mb-4">
             {errorMessage}
           </div>
         )}
 
-        {/* Nama Lengkap */}
-        <div>
-          <label htmlFor="name" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-            Nama Lengkap <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
+        {/* IDENTITAS PENGUNJUNG */}
+        <div className="tamu-section">
+          <div className="tamu-section-title">Identitas Pengunjung</div>
+          <div className="tamu-row2">
+            <div className="tamu-field">
+              <label htmlFor="name">Nama Lengkap <span className="tamu-req">*</span></label>
+              <input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onBlur={() => setTouched(prev => ({ ...prev, name: true }))}
+                placeholder="Nama lengkap Anda..."
+                className={`tamu-input ${touched.name && !name.trim() ? 'error' : ''}`}
+              />
+            </div>
+            <div className="tamu-field">
+              <label htmlFor="gender">Jenis Kelamin</label>
+              <CustomSelect 
+                id="gender" 
+                value={gender} 
+                onChange={(val) => setGender(val)}
+                options={[
+                  { value: 'L', label: 'Laki-laki' },
+                  { value: 'P', label: 'Perempuan' }
+                ]}
+                placeholder="-- Pilih --"
+              />
+            </div>
+          </div>
+          <div className="tamu-field">
+            <label htmlFor="phone">No. HP / WhatsApp</label>
             <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onBlur={() => setTouched(prev => ({ ...prev, name: true }))}
-              placeholder="Contoh: Ahmad Dahlan"
-              className={`w-full py-3 pl-11 pr-4 bg-candi-cream/30 border rounded-xl text-sm transition duration-150 ${
-                touched.name && !name.trim() 
-                  ? 'border-red-400 bg-red-50/20' 
-                  : 'border-candi-gold-light hover:border-candi-gold/60'
-              }`}
+              type="tel"
+              id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="08xx-xxxx-xxxx (opsional)"
+              className="tamu-input"
             />
-            <User className="w-4 h-4 text-candi-muted absolute left-4 top-3.5" />
           </div>
         </div>
 
-        {/* If Rombongan: Org Name, Org Members, Org Position */}
+        {/* DATA ORGANISASI / ROMBONGAN */}
         {visitorType === 'rombongan' && (
-          <div className="space-y-5 p-4 bg-candi-gold-light/20 rounded-xl border border-candi-gold-light/50 animate-fade-in">
-            {/* Org Name */}
-            <div>
-              <label htmlFor="orgName" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-                Nama Instansi / Rombongan <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
+          <div className="tamu-section animate-fade-in">
+            <div className="tamu-section-title">Data Organisasi / Rombongan</div>
+            <div className="tamu-row2">
+              <div className="tamu-field">
+                <label htmlFor="orgName">Nama Organisasi / Instansi <span className="tamu-req">*</span></label>
                 <input
                   type="text"
                   id="orgName"
                   value={orgName}
                   onChange={(e) => setOrgName(e.target.value)}
                   onBlur={() => setTouched(prev => ({ ...prev, orgName: true }))}
-                  placeholder="Contoh: SMA 1 Boyolangu / Keluarga Besar"
-                  className={`w-full py-3 pl-11 pr-4 bg-candi-white border rounded-xl text-sm transition duration-150 ${
-                    touched.orgName && !orgName.trim() 
-                      ? 'border-red-400 bg-red-50/20' 
-                      : 'border-candi-gold-light hover:border-candi-gold/60'
-                  }`}
+                  placeholder="Nama organisasi..."
+                  className={`tamu-input ${touched.orgName && !orgName.trim() ? 'error' : ''}`}
                 />
-                <Building className="w-4 h-4 text-candi-muted absolute left-4 top-3.5" />
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {/* Org Members Count */}
-              <div>
-                <label htmlFor="orgMembers" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-                  Jumlah Anggota <span className="text-red-500">*</span>
-                </label>
+              <div className="tamu-field">
+                <label htmlFor="orgMembers">Jumlah Anggota <span className="tamu-req">*</span></label>
                 <input
                   type="number"
                   id="orgMembers"
-                  min="1"
+                  min="2"
                   value={orgMembers}
                   onChange={(e) => setOrgMembers(e.target.value)}
                   onBlur={() => setTouched(prev => ({ ...prev, orgMembers: true }))}
-                  placeholder="Jumlah"
-                  className={`w-full py-3 px-4 bg-candi-white border rounded-xl text-sm transition duration-150 ${
-                    touched.orgMembers && (!orgMembers || Number(orgMembers) <= 0) 
-                      ? 'border-red-400 bg-red-50/20' 
-                      : 'border-candi-gold-light hover:border-candi-gold/60'
-                  }`}
+                  placeholder="Contoh: 35"
+                  className={`tamu-input ${touched.orgMembers && (!orgMembers || Number(orgMembers) <= 0) ? 'error' : ''}`}
                 />
               </div>
-
-              {/* Org Position */}
-              <div>
-                <label htmlFor="orgPosition" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-                  Jabatan Anda
-                </label>
-                <input
-                  type="text"
-                  id="orgPosition"
-                  value={orgPosition}
-                  onChange={(e) => setOrgPosition(e.target.value)}
-                  placeholder="Contoh: Ketua"
-                  className="w-full py-3 px-4 bg-candi-white border border-candi-gold-light hover:border-candi-gold/60 rounded-xl text-sm transition duration-150"
-                />
-              </div>
+            </div>
+            <div className="tamu-field">
+              <label htmlFor="orgPosition">Jabatan / Posisi</label>
+              <input
+                type="text"
+                id="orgPosition"
+                value={orgPosition}
+                onChange={(e) => setOrgPosition(e.target.value)}
+                placeholder="Ketua rombongan, guru pendamping..."
+                className="tamu-input"
+              />
             </div>
           </div>
         )}
 
-        {/* Geographic Location Selection Group */}
-        <div className="space-y-5">
-          <div className="grid grid-cols-2 gap-4">
-            {/* Negara Asal */}
-            <div>
-              <label htmlFor="country" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-                Negara
-              </label>
-              <input
-                type="text"
-                id="country"
-                value={country}
+        {/* ASAL DAERAH */}
+        <div className="tamu-section">
+          <div className="tamu-section-title">Asal Daerah</div>
+          
+          <div className="tamu-field" style={{ marginBottom: '18px' }}>
+            <label className="flex items-center gap-2 cursor-pointer" style={{ textTransform: 'none', letterSpacing: 'normal' }}>
+              <input 
+                type="checkbox" 
+                checked={country.toLowerCase() !== 'indonesia'}
                 onChange={(e) => {
-                  const nextCountry = e.target.value;
-                  setCountry(nextCountry);
-                  if (nextCountry.toLowerCase() !== 'indonesia') {
-                    setSelectedProvinceId('');
+                  if (e.target.checked) {
+                    setCountry(''); // Kosongkan agar bisa diisi nama negara
                     setProvince('');
                     setCity('');
+                    setSelectedProvinceId('');
+                  } else {
+                    setCountry('Indonesia');
+                    setProvince('');
+                    setCity('');
+                    setSelectedProvinceId('');
                   }
                 }}
-                placeholder="Indonesia"
-                className="w-full py-3 px-4 bg-candi-cream/30 border border-candi-gold-light hover:border-candi-gold/60 rounded-xl text-sm transition duration-150 outline-none focus:border-candi-gold focus:ring-1 focus:ring-candi-gold/30"
+                className="w-[15px] h-[15px] cursor-pointer accent-[#b8841a]"
               />
-            </div>
+              <span className="text-[13px] text-[#5a4a30] font-medium">Berasal dari luar negeri?</span>
+            </label>
+          </div>
 
-            {/* Provinsi */}
-            <div>
-              <label htmlFor="province" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-                Provinsi
-              </label>
+          <div className="tamu-row2">
+            <div className="tamu-field">
+              <label htmlFor="city">Asal Kota / Kabupaten <span className="tamu-req">*</span></label>
               {country.toLowerCase() === 'indonesia' ? (
                 <CustomSelect
-                  value={selectedProvinceId}
-                  onChange={(pId) => {
-                    setSelectedProvinceId(pId);
-                    const selectedProv = provinces.find((p) => p.id === pId);
-                    setProvince(selectedProv ? toTitleCase(selectedProv.name) : '');
-                    setCity(''); // Clear city selection when province changes
+                  id="city"
+                  value={city}
+                  onChange={(val) => {
+                    setCity(val);
+                    setTouched(prev => ({ ...prev, city: true }));
                   }}
-                  options={provinces.map((prov) => ({
-                    value: prov.id,
-                    label: toTitleCase(prov.name)
-                  }))}
-                  placeholder="-- Pilih Provinsi --"
+                  disabled={!selectedProvinceId}
+                  options={regencies.map(reg => ({ value: toTitleCase(reg.name), label: toTitleCase(reg.name) }))}
+                  placeholder={selectedProvinceId ? '-- Pilih Kota/Kabupaten --' : '-- Pilih --'}
+                  error={touched.city && !city.trim()}
+                />
+              ) : (
+                <input
+                  type="text"
+                  id="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  onBlur={() => setTouched(prev => ({ ...prev, city: true }))}
+                  placeholder="Contoh: Kuala Lumpur..."
+                  className={`tamu-input ${touched.city && !city.trim() ? 'error' : ''}`}
+                />
+              )}
+            </div>
+            <div className="tamu-field">
+              <label htmlFor="province">Provinsi</label>
+              {country.toLowerCase() === 'indonesia' ? (
+                <CustomSelect
+                  id="province"
+                  value={selectedProvinceId}
+                  onChange={(val) => {
+                    setSelectedProvinceId(val);
+                    const selectedProv = provinces.find((p) => p.id === val);
+                    setProvince(selectedProv ? toTitleCase(selectedProv.name) : '');
+                    setCity('');
+                  }}
+                  options={provinces.map(prov => ({ value: prov.id, label: toTitleCase(prov.name) }))}
+                  placeholder="-- Pilih --"
                 />
               ) : (
                 <input
@@ -444,184 +487,87 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
                   id="province"
                   value={province}
                   onChange={(e) => setProvince(e.target.value)}
-                  placeholder="Nama Provinsi/Bagian"
-                  className="w-full py-3 px-4 bg-candi-cream/30 border border-candi-gold-light hover:border-candi-gold/60 rounded-xl text-sm transition duration-150 outline-none focus:border-candi-gold focus:ring-1 focus:ring-candi-gold/30"
+                  placeholder="Negara Bagian (opsional)"
+                  className="tamu-input"
                 />
               )}
             </div>
           </div>
-
-          {/* Asal Kota */}
-          <div>
-            <label htmlFor="city" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-              Asal Kota / Kabupaten <span className="text-red-500">*</span>
-            </label>
-            {country.toLowerCase() === 'indonesia' ? (
-              <CustomSelect
-                value={city}
-                onChange={(val) => {
-                  setCity(val);
-                  setTouched(prev => ({ ...prev, city: true }));
-                }}
-                disabled={!selectedProvinceId}
-                error={touched.city && !city.trim()}
-                options={regencies.map((reg) => ({
-                  value: toTitleCase(reg.name),
-                  label: toTitleCase(reg.name)
-                }))}
-                placeholder={selectedProvinceId ? '-- Pilih Kota/Kabupaten --' : '-- Pilih Provinsi Dulu --'}
+          
+          {country.toLowerCase() !== 'indonesia' && (
+            <div className="tamu-field mt-3">
+              <label htmlFor="country">
+                Negara Asal <span className="tamu-req">*</span>
+              </label>
+              <input
+                type="text"
+                id="country"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder="Contoh: Malaysia, Belanda..."
+                className="tamu-input"
               />
-            ) : (
-              <div className="relative">
-                <input
-                  type="text"
-                  id="city"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  onBlur={() => setTouched(prev => ({ ...prev, city: true }))}
-                  placeholder="Contoh: Kuala Lumpur / Singapore City"
-                  className={`w-full py-3 pl-11 pr-4 bg-candi-cream/30 border rounded-xl text-sm transition duration-150 outline-none focus:border-candi-gold focus:ring-1 focus:ring-candi-gold/30 ${
-                    touched.city && !city.trim() 
-                      ? 'border-red-400 bg-red-50/20' 
-                      : 'border-candi-gold-light hover:border-candi-gold/60'
-                  }`}
-                />
-                <MapPin className="w-4 h-4 text-candi-muted absolute left-4 top-3.5" />
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          {/* No. HP / WA */}
-          <div>
-            <label htmlFor="phone" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-              No. HP / WA
-            </label>
-            <div className="relative">
-              <input
-                type="tel"
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="0812xxxx"
-                className="w-full py-3 pl-11 pr-4 bg-candi-cream/30 border border-candi-gold-light hover:border-candi-gold/60 rounded-xl text-sm transition duration-150 outline-none focus:border-candi-gold focus:ring-1 focus:ring-candi-gold/30"
-              />
-              <Phone className="w-4 h-4 text-candi-muted absolute left-4 top-3.5" />
-            </div>
-          </div>
-
-          {/* Jenis Kelamin */}
-          <div>
-            <label htmlFor="gender" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-              Jenis Kelamin
-            </label>
+        {/* TUJUAN & KESAN */}
+        <div className="tamu-section">
+          <div className="tamu-section-title">Tujuan & Kesan</div>
+          <div className="tamu-field">
+            <label htmlFor="visitPurpose">Tujuan Kunjungan</label>
             <CustomSelect
-              value={gender}
-              onChange={(val) => setGender(val)}
-              options={[
-                { value: 'L', label: 'Laki-laki' },
-                { value: 'P', label: 'Perempuan' }
-              ]}
-              placeholder="-- Pilih --"
+              id="visitPurpose"
+              value={visitPurpose}
+              onChange={(val) => setVisitPurpose(val)}
+              options={VISIT_PURPOSE_OPTIONS}
+              placeholder="-- Pilih Tujuan --"
             />
           </div>
-        </div>
-
-        {/* Tujuan Kunjungan */}
-        <div>
-          <label htmlFor="visitPurpose" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-            Tujuan Kunjungan
-          </label>
-          <CustomSelect
-            value={visitPurpose}
-            onChange={(val) => setVisitPurpose(val)}
-            options={VISIT_PURPOSES.map((purpose) => ({
-              value: purpose,
-              label: purpose
-            }))}
-            placeholder="-- Pilih Tujuan --"
-          />
-        </div>
-
-        {/* Rating Bintang */}
-        <div>
-          <span className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2 flex items-center gap-1">
-            <span>Penilaian Candi Dadi</span>
-            <span title="Pilih rating bintang dari 1-5">
-              <HelpCircle className="w-3.5 h-3.5 text-candi-muted" />
-            </span>
-          </span>
-          <div className="flex items-center gap-2 bg-candi-cream/30 border border-candi-gold-light py-2.5 px-4 rounded-xl justify-center">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                onClick={() => setRating(star)}
-                onMouseEnter={() => setHoverRating(star)}
-                onMouseLeave={() => setHoverRating(0)}
-                className="p-1 cursor-pointer transition duration-100 hover:scale-115"
-              >
-                <Star
-                  className={`w-7 h-7 ${
-                    star <= (hoverRating || rating)
-                      ? 'fill-candi-gold text-candi-gold'
-                      : 'text-candi-gold-light'
-                  }`}
-                />
-              </button>
-            ))}
-            {rating > 0 && (
-              <span className="text-xs font-bold text-candi-gold ml-2">{rating}/5 Bintang</span>
-            )}
-          </div>
-        </div>
-
-        {/* Kesan & Pesan */}
-        <div>
-          <label htmlFor="impression" className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-2">
-            Kesan & Pesan
-          </label>
-          <div className="relative">
+          <div className="tamu-field">
+            <label htmlFor="impression">Kesan Kunjungan</label>
             <textarea
               id="impression"
-              rows={3}
               value={impression}
               onChange={(e) => setImpression(e.target.value)}
-              placeholder="Tulis kesan, pesan, atau masukan untuk pengelolaan Candi Dadi..."
-              className="w-full py-3 pl-11 pr-4 bg-candi-cream/30 border border-candi-gold-light hover:border-candi-gold/60 rounded-xl text-sm transition duration-150 resize-none"
+              placeholder="Ceritakan pengalaman Anda mengunjungi Candi Dadi..."
+              className="tamu-textarea"
             />
-            <Smile className="w-4 h-4 text-candi-muted absolute left-4 top-3.5" />
+          </div>
+          <div className="tamu-field">
+            <label>Penilaian</label>
+            <div className="flex gap-2 flex-wrap">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setRating(star)}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  className="bg-transparent border-none text-[22px] cursor-pointer p-0.5 leading-none transition-all duration-150"
+                  style={{ opacity: star <= (hoverRating || rating) ? 1 : 0.3 }}
+                  title={['Kurang', 'Cukup', 'Baik', 'Sangat Baik', 'Luar Biasa'][star - 1]}
+                >
+                  ⭐
+                </button>
+              ))}
+            </div>
+            <div style={{ fontSize: '11px', color: '#9a8468', marginTop: '5px' }}>
+              {(hoverRating || rating) > 0 
+                ? ['', 'Kurang', 'Cukup', 'Baik', 'Sangat Baik', 'Luar Biasa! ✨'][hoverRating || rating] 
+                : 'Pilih bintang penilaian'}
+            </div>
           </div>
         </div>
 
         {/* Submit Button */}
-        <div className="pt-2">
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full py-4 text-white font-bold rounded-xl transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer ${
-              isLoading 
-                ? 'bg-candi-muted cursor-not-allowed' 
-                : 'bg-candi-gold hover:bg-candi-gold-dark'
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Menyimpan…</span>
-              </>
-            ) : (
-              <>
-                <Heart className="w-4 h-4 fill-white" />
-                <span>Kirim Buku Tamu</span>
-              </>
-            )}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="tamu-btn-submit"
+        >
+          {isLoading ? 'MENGIRIM…' : <>🏛️ &nbsp;Kirim Buku Tamu</>}
+        </button>
       </form>
     </div>
   );

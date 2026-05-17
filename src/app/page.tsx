@@ -16,25 +16,20 @@ export default function GuestBookPage() {
   };
 
   return (
-    <div className="min-h-screen bg-candi-cream selection:bg-candi-gold/20 py-10 px-4 flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Decorative Traditional Border Accents */}
-      <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-candi-gold-light via-candi-gold to-candi-gold-dark"></div>
+    <div className="w-full max-w-[600px] mx-auto px-4 pb-16 selection:bg-candi-gold/20">
+      <VisitorHeader />
 
-      <div className="w-full max-w-md relative z-10">
-        <VisitorHeader />
+      {isSuccess ? (
+        <SuccessCard name={guestName} onReset={() => setIsSuccess(false)} />
+      ) : (
+        <CheckInForm onSuccess={handleSuccess} />
+      )}
 
-        {isSuccess ? (
-          <SuccessCard name={guestName} onReset={() => setIsSuccess(false)} />
-        ) : (
-          <CheckInForm onSuccess={handleSuccess} />
-        )}
-
-        {/* Footer Accent */}
-        <div className="text-center mt-8 text-xs text-candi-muted font-medium">
-          <p suppressHydrationWarning>© {new Date().getFullYear()} Candi Dadi. All rights reserved.</p>
-          <p className="mt-1">Pemerintah Kabupaten Tulungagung - Balai Pelestarian Kebudayaan</p>
-        </div>
-      </div>
+      {/* Footer */}
+      <footer className="text-center py-5 text-[11px] text-tamu-stone-lt tracking-[0.5px] mt-2">
+        <p suppressHydrationWarning>© {new Date().getFullYear()} Candi Dadi. All rights reserved.</p>
+        <p className="mt-1">Pemerintah Kabupaten Tulungagung - Balai Pelestarian Kebudayaan</p>
+      </footer>
     </div>
   );
 }
