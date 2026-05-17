@@ -86,12 +86,6 @@ export default function AdminPortal() {
                 className="rounded-full shadow-md"
                 priority
               />
-              <div className="inline-flex items-center justify-center size-12 bg-candi-cream rounded-full border-2 border-candi-gold-light/80 shadow-inner">
-                <svg viewBox="0 0 100 100" className="size-6 fill-candi-gold">
-                  <path d="M50 15 L57 25 H43 L50 15 Z M50 25 L65 40 H35 L50 25 Z M50 40 L72 65 H28 L50 40 Z M33 65 H67 V90 H33 V65 Z" stroke="currentColor" strokeWidth="2.5" fill="none" />
-                  <rect x="44" y="73" width="12" height="17" rx="1" stroke="currentColor" strokeWidth="2" fill="none" />
-                </svg>
-              </div>
             </div>
             <h1 className="font-serif text-2xl font-semibold tracking-wide text-candi-charcoal">LOGIN ADMINISTRATOR</h1>
             <p className="text-xs font-semibold tracking-widest text-candi-gold uppercase mt-0.5">Buku Tamu Candi Dadi</p>
