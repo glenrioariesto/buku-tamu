@@ -47,6 +47,16 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // GPS Geofencing Lock states
+  const [gpsSettings, setGpsSettings] = useState<{
+    enabled: boolean;
+    lat: number;
+    lng: number;
+    radius: number;
+  } | null>(null);
+  const [gpsChecking, setGpsChecking] = useState(false);
+  const [gpsLockError, setGpsLockError] = useState('');
+
   // Validations
   const [touched, setTouched] = useState({ name: false, city: false, orgName: false, orgMembers: false });
 
@@ -63,6 +73,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
       .join(' ');
   };
 
+  // Load provinces static database
   useEffect(() => {
     async function loadProvinces() {
       try {
@@ -78,6 +89,24 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
     loadProvinces();
   }, []);
 
+  // Fetch active GPS geofencing rules from DB anonymously
+  useEffect(() => {
+    fetch('/api/auth')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setGpsSettings({
+            enabled: data.gps_lock_enabled,
+            lat: data.candi_latitude,
+            lng: data.candi_longitude,
+            radius: data.allowed_radius_meters,
+          });
+        }
+      })
+      .catch((err) => console.error('Failed to load GPS config:', err));
+  }, []);
+
+  // Load regencies dynamically
   useEffect(() => {
     if (!selectedProvinceId) {
       setRegencies([]);
@@ -96,6 +125,18 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
     }
     loadRegencies();
   }, [selectedProvinceId]);
+
+  // Haversine formula to compute distance in meters between user and temple
+  const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371e3; // Earth radius in meters
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in meters
+  };
 
   const validateForm = () => {
     if (!name.trim()) return 'Nama Lengkap wajib diisi.';
@@ -118,6 +159,49 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
     }
 
     setErrorMessage('');
+    setGpsLockError('');
+
+    // GPS Geofencing verification
+    if (gpsSettings && gpsSettings.enabled) {
+      setGpsChecking(true);
+      
+      const checkGps = (): Promise<GeolocationPosition> => {
+        return new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          });
+        });
+      };
+
+      try {
+        const position = await checkGps();
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+        const distance = getDistance(userLat, userLng, gpsSettings.lat, gpsSettings.lng);
+
+        if (distance > gpsSettings.radius) {
+          setGpsLockError(`Anda terdeteksi berada di luar area Candi Dadi (jarak Anda: ${Math.round(distance)}m). Batas toleransi pengisian adalah ${gpsSettings.radius}m. Pengisian buku tamu wajib di lokasi.`);
+          setGpsChecking(false);
+          return;
+        }
+      } catch (err: any) {
+        console.error('GPS access error:', err);
+        let errMsg = 'Gagal mengakses lokasi GPS Anda. Mohon aktifkan GPS handphone Anda dan izinkan browser mengakses lokasi di browser untuk mengisi buku tamu.';
+        if (err.code === 1) {
+          errMsg = 'Izin lokasi ditolak. Silakan aktifkan izin lokasi browser di pengaturan handphone Anda agar dapat check-in.';
+        } else if (err.code === 3) {
+          errMsg = 'Waktu permintaan lokasi habis (timeout). Silakan segarkan halaman dan coba lagi di area terbuka.';
+        }
+        setGpsLockError(errMsg);
+        setGpsChecking(false);
+        return;
+      }
+      
+      setGpsChecking(false);
+    }
+
     setIsLoading(true);
 
     try {
@@ -160,7 +244,19 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
   };
 
   return (
-    <div className="bg-candi-white rounded-2xl shadow-xl border border-candi-gold-light/60 p-6 md:p-8">
+    <div className="bg-candi-white rounded-2xl shadow-xl border border-candi-gold-light/60 p-6 md:p-8 relative overflow-hidden">
+      {/* Geofencing Verification Overlay Loader */}
+      {gpsChecking && (
+        <div className="absolute inset-0 bg-candi-white/95 rounded-2xl flex flex-col items-center justify-center p-6 text-center z-25 animate-fade-in">
+          <div className="w-16 h-16 rounded-full bg-candi-cream flex items-center justify-center border border-candi-gold/30 animate-pulse mb-4">
+            <MapPin className="w-8 h-8 text-candi-gold animate-bounce" />
+          </div>
+          <h4 className="font-serif text-lg font-bold text-candi-charcoal">Memverifikasi Lokasi GPS Anda…</h4>
+          <p className="text-xs text-candi-muted mt-2 max-w-xs leading-relaxed">
+            Sistem sedang memastikan koordinat GPS Anda berada dalam area cagar budaya Candi Dadi demi keaslian data kunjungan.
+          </p>
+        </div>
+      )}
       {/* Visitor Type Animated Switcher */}
       <div className="flex bg-candi-cream p-1 rounded-xl mb-6 border border-candi-gold-light/50">
         <button
@@ -190,6 +286,16 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* GPS Geofencing Lockout Alert */}
+        {gpsLockError && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 font-bold flex flex-col gap-2 animate-fade-in">
+            <div className="flex items-start gap-2.5">
+              <MapPin className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+              <span>{gpsLockError}</span>
+            </div>
+          </div>
+        )}
+
         {/* Error Message banner */}
         {errorMessage && (
           <div className="p-3.5 bg-red-50 border border-red-200/80 rounded-xl text-sm text-red-600 font-medium animate-pulse">

@@ -13,15 +13,22 @@ async function seed() {
   
   // 1. Seed admin settings
   console.log('🔑 Seeding admin settings...');
-  await db.insert(schema.settings)
-    .values({
-      key: 'admin_password',
-      value: 'candidad1', // Default password from requirement
-    })
-    .onConflictDoUpdate({
-      target: schema.settings.key,
-      set: { value: 'candidad1', updatedAt: new Date() }
-    });
+  const defaultSettings = [
+    { key: 'admin_password', value: 'candidad1' },
+    { key: 'gps_lock_enabled', value: 'false' },
+    { key: 'candi_latitude', value: '-8.130248' },
+    { key: 'candi_longitude', value: '111.926823' },
+    { key: 'allowed_radius_meters', value: '200' }
+  ];
+
+  for (const s of defaultSettings) {
+    await db.insert(schema.settings)
+      .values(s)
+      .onConflictDoUpdate({
+        target: schema.settings.key,
+        set: { value: s.value, updatedAt: new Date() }
+      });
+  }
   
   // 2. Seed dummy guests
   console.log('📋 Seeding visitor entries...');
