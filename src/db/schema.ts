@@ -20,7 +20,7 @@ export const guests = sqliteTable('guests', {
   orgPosition: text('org_position'),
   
   createdAt: integer('created_at', { mode: 'timestamp' })
-    .default(sql`(strftime('%s', 'now') * 1000)`)
+    .default(sql`(strftime('%s', 'now'))`)
     .notNull(),
 });
 

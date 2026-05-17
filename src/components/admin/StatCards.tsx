@@ -11,11 +11,15 @@ export default function StatCards() {
   const totalGuests = guests.length;
   
   const todayGuests = guests.filter((g) => {
+    if (!g.createdAt) return false;
     const now = new Date();
-    const todayStr = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-    const d = new Date(g.createdAt);
-    const guestStr = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    return todayStr === guestStr;
+    const guestDate = new Date(g.createdAt);
+    if (isNaN(guestDate.getTime())) return false;
+    return (
+      guestDate.getFullYear() === now.getFullYear() &&
+      guestDate.getMonth() === now.getMonth() &&
+      guestDate.getDate() === now.getDate()
+    );
   }).length;
 
   const personalGuests = guests.filter((g) => g.type === 'personal').length;
