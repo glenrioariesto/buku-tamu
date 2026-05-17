@@ -255,7 +255,7 @@ export default function VisitorTable() {
                   <td colSpan={8} className="py-12 text-center text-candi-muted font-medium">
                     <div className="flex flex-col items-center gap-3">
                       <RefreshCw className="w-8 h-8 animate-spin text-candi-gold" />
-                      <span>Memuat data dari database...</span>
+                      <span>Memuat data dari database…</span>
                     </div>
                   </td>
                 </tr>
@@ -295,7 +295,7 @@ export default function VisitorTable() {
                             <Building className="w-3 h-3" />
                             <span>{guest.orgName} ({guest.orgMembers} org)</span>
                             {guest.orgPosition && (
-                              <span className="text-[10px] text-candi-muted ml-1 italic">— {guest.orgPosition}</span>
+                              <span className="text-[10px] text-candi-muted ml-1 italic">- {guest.orgPosition}</span>
                             )}
                           </div>
                         )}
@@ -332,10 +332,10 @@ export default function VisitorTable() {
                           ))}
                         </div>
                       ) : (
-                        <span className="text-stone-300">—</span>
+                        <span className="text-stone-300">-</span>
                       )}
                     </td>
-                    <td className="py-4 px-4 text-candi-muted font-medium text-xs">
+                    <td suppressHydrationWarning className="py-4 px-4 text-candi-muted font-medium text-xs">
                       {new Date(guest.createdAt).toLocaleString('id-ID', {
                         day: 'numeric',
                         month: 'short',

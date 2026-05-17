@@ -148,7 +148,7 @@ export default function AdminPortal() {
             </div>
             <div>
               <h1 className="font-serif text-xl md:text-2xl font-bold tracking-wide text-candi-charcoal leading-tight">
-                PANEL ADMIN — CANDI DADI
+                PANEL ADMIN - CANDI DADI
               </h1>
               <p className="text-xs font-semibold text-candi-muted tracking-wider">
                 Buku Tamu Pengunjung

@@ -84,21 +84,20 @@ export async function POST(req: Request) {
 
     if (action === 'updateSettings') {
       await db.transaction(async (tx) => {
-        await tx.insert(settings)
-          .values({ key: 'gps_lock_enabled', value: gpsLockEnabled ? 'true' : 'false', updatedAt: new Date() })
-          .onConflictDoUpdate({ target: settings.key, set: { value: gpsLockEnabled ? 'true' : 'false', updatedAt: new Date() } });
-
-        await tx.insert(settings)
-          .values({ key: 'candi_latitude', value: String(candiLatitude), updatedAt: new Date() })
-          .onConflictDoUpdate({ target: settings.key, set: { value: String(candiLatitude), updatedAt: new Date() } });
-
-        await tx.insert(settings)
-          .values({ key: 'candi_longitude', value: String(candiLongitude), updatedAt: new Date() })
-          .onConflictDoUpdate({ target: settings.key, set: { value: String(candiLongitude), updatedAt: new Date() } });
-
-        await tx.insert(settings)
-          .values({ key: 'allowed_radius_meters', value: String(allowedRadiusMeters), updatedAt: new Date() })
-          .onConflictDoUpdate({ target: settings.key, set: { value: String(allowedRadiusMeters), updatedAt: new Date() } });
+        await Promise.all([
+          tx.insert(settings)
+            .values({ key: 'gps_lock_enabled', value: gpsLockEnabled ? 'true' : 'false', updatedAt: new Date() })
+            .onConflictDoUpdate({ target: settings.key, set: { value: gpsLockEnabled ? 'true' : 'false', updatedAt: new Date() } }),
+          tx.insert(settings)
+            .values({ key: 'candi_latitude', value: String(candiLatitude), updatedAt: new Date() })
+            .onConflictDoUpdate({ target: settings.key, set: { value: String(candiLatitude), updatedAt: new Date() } }),
+          tx.insert(settings)
+            .values({ key: 'candi_longitude', value: String(candiLongitude), updatedAt: new Date() })
+            .onConflictDoUpdate({ target: settings.key, set: { value: String(candiLongitude), updatedAt: new Date() } }),
+          tx.insert(settings)
+            .values({ key: 'allowed_radius_meters', value: String(allowedRadiusMeters), updatedAt: new Date() })
+            .onConflictDoUpdate({ target: settings.key, set: { value: String(allowedRadiusMeters), updatedAt: new Date() } })
+        ]);
       });
 
       return NextResponse.json({ success: true, message: 'Pengaturan berhasil diperbarui!' });

@@ -114,9 +114,9 @@ async function seed() {
     }
   ];
 
-  for (const guest of dummyGuests) {
-    await db.insert(schema.guests).values(guest);
-  }
+  await Promise.all(
+    dummyGuests.map(guest => db.insert(schema.guests).values(guest))
+  );
 
   console.log('✅ Seeding completed successfully!');
 }

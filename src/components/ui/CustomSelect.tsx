@@ -84,10 +84,10 @@ export default function CustomSelect({
               Tidak ada pilihan
             </div>
           ) : (
-            options.map((opt, idx) => {
+            options.map((opt) => {
               if (opt.isGroup) {
                 return (
-                  <div key={`group-${idx}`} className="px-3 pt-3 pb-1.5 text-[11px] font-semibold text-[#9a8468] uppercase tracking-wide">
+                  <div key={`group-${opt.label}`} className="px-3 pt-3 pb-1.5 text-[11px] font-semibold text-[#9a8468] uppercase tracking-wide">
                     {opt.label}
                   </div>
                 );
@@ -96,7 +96,7 @@ export default function CustomSelect({
               const isSelected = opt.value === value;
               return (
                 <button
-                  key={`opt-${idx}-${opt.value}`}
+                  key={`opt-${opt.value}`}
                   type="button"
                   onClick={() => handleSelect(opt.value, opt.isGroup)}
                   className={`w-full px-3 py-2 text-left text-[14px] transition-colors duration-100 flex items-center justify-between cursor-pointer ${
