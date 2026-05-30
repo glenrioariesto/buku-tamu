@@ -79,7 +79,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
             currentPage: data.page,
             totalPages: data.totalPages,
             totalGuests: data.total,
-            stats: data.stats,
+            ...(data.stats ? { stats: data.stats } : {}),
           });
         }
       }
