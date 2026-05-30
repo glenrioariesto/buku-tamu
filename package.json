@@ -10,7 +10,10 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "npx tsx src/db/seed.ts",
-    "deploy": "deploy-production.bat"
+    "deploy": "deploy-production.bat",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@libsql/client": "^0.17.3",

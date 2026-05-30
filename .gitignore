@@ -46,10 +46,3 @@ candi-dadi.db
 
 # temp screenshots
 screencapture-*.png
-
-# development-only files (tidak perlu masuk production)
-vitest.config.ts
-src/test/
-drizzle/
-scripts/
-deploy-production.bat

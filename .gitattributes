@@ -1,0 +1,4 @@
+# File-file berikut hanya ada di branch development
+# Saat merge ke master, file ini otomatis di-drop (tidak ikut production)
+src/test/        merge=ours-drop
+vitest.config.ts merge=ours-drop
