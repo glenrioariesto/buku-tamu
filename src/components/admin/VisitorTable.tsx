@@ -261,7 +261,7 @@ export default function VisitorTable() {
             <Search className="size-4 text-candi-muted absolute left-3.5 top-3.5" />
           </div>
           <div className="bg-candi-gold text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0">
-            {totalGuests} Pengunjung
+            {totalGuests} Total Entri
           </div>
         </div>
       </div>

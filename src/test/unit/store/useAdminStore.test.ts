@@ -1,4 +1,3 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useAdminStore } from '@/store/useAdminStore';
 
@@ -38,7 +37,7 @@ beforeEach(() => {
 
 describe('useAdminStore — fetchGuests', () => {
   it('update stats saat fetch page 1', async () => {
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         success: true,
@@ -60,10 +59,9 @@ describe('useAdminStore — fetchGuests', () => {
   });
 
   it('TIDAK overwrite stats saat fetch page 2 (stats null dari API)', async () => {
-    // Set stats awal dari page 1
     useAdminStore.setState({ stats: mockStats });
 
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         success: true,
@@ -71,14 +69,13 @@ describe('useAdminStore — fetchGuests', () => {
         page: 2,
         totalPages: 3,
         total: 100,
-        stats: null, // API tidak kirim stats di page > 1
+        stats: null,
       }),
     } as Response);
 
     const { result } = renderHook(() => useAdminStore());
     await act(async () => { await result.current.fetchGuests(2); });
 
-    // Stats harus tetap dari page 1
     expect(result.current.stats.total).toBe(100);
     expect(result.current.stats.totalVisitors).toBe(260);
     expect(result.current.currentPage).toBe(2);
@@ -86,7 +83,7 @@ describe('useAdminStore — fetchGuests', () => {
 
   it('set isLoading true saat fetch, false setelah selesai', async () => {
     let resolveFetch!: (v: unknown) => void;
-    global.fetch = vi.fn().mockReturnValueOnce(
+    global.fetch = jest.fn().mockReturnValueOnce(
       new Promise((r) => { resolveFetch = r; })
     );
 
@@ -104,7 +101,7 @@ describe('useAdminStore — fetchGuests', () => {
   });
 
   it('isLoading false jika fetch gagal (network error)', async () => {
-    global.fetch = vi.fn().mockRejectedValueOnce(new Error('Network error'));
+    global.fetch = jest.fn().mockRejectedValueOnce(new Error('Network error'));
 
     const { result } = renderHook(() => useAdminStore());
     await act(async () => { await result.current.fetchGuests(); });
@@ -117,7 +114,7 @@ describe('useAdminStore — deleteGuest', () => {
   it('hapus guest dari list setelah delete berhasil', async () => {
     useAdminStore.setState({ guests: mockGuests });
 
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    global.fetch = jest.fn().mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true }),
     } as Response);
@@ -131,7 +128,7 @@ describe('useAdminStore — deleteGuest', () => {
   it('tidak hapus guest jika API gagal', async () => {
     useAdminStore.setState({ guests: mockGuests });
 
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    global.fetch = jest.fn().mockResolvedValueOnce({
       ok: false,
       json: async () => ({ success: false }),
     } as Response);

@@ -57,7 +57,7 @@ if errorlevel 1 (
 :: Hapus file development-only dari master setelah merge
 if exist src\test (
   git rm -r --cached src/test/ >nul 2>&1
-  git rm --cached vitest.config.ts >nul 2>&1
+  git rm --cached jest.config.ts >nul 2>&1
   git rm --cached deploy-production.bat >nul 2>&1
   git rm --cached scripts/migrate-turso.mjs >nul 2>&1
   git rm -r --cached drizzle/ >nul 2>&1
