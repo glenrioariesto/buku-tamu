@@ -50,9 +50,7 @@ async function seed() {
       visitPurpose: 'Wisata & Rekreasi',
       rating: 5,
       impression: 'Pemandangan dari candi sangat memukau, udaranya segar sekali. Akses jalan perlu sedikit diperlebar.',
-      orgName: null,
-      orgMembers: null,
-      orgPosition: null,
+      pekerjaan: 'Wiraswasta',
     },
     {
       type: 'rombongan' as const,
@@ -65,9 +63,10 @@ async function seed() {
       visitPurpose: 'Akademik & Penelitian',
       rating: 5,
       impression: 'Melakukan penelitian arkeologi tentang struktur batuan Candi Dadi. Situs yang sangat terawat!',
-      orgName: 'Program Studi Arkeologi UGM',
+      orgName: 'Perguruan Tinggi / Mahasiswa',
       orgMembers: 15,
       orgPosition: 'Dosen Pembimbing',
+      jenisOrganisasi: 'Program Studi',
     },
     {
       type: 'personal' as const,
@@ -80,9 +79,7 @@ async function seed() {
       visitPurpose: 'Wisata & Rekreasi',
       rating: 4,
       impression: 'Beautiful quiet temple. Nice sunset view from the top of the hill.',
-      orgName: null,
-      orgMembers: null,
-      orgPosition: null,
+      pekerjaan: 'Karyawan Swasta',
     },
     {
       type: 'personal' as const,
@@ -95,9 +92,7 @@ async function seed() {
       visitPurpose: 'Lainnya',
       rating: 5,
       impression: 'Ziarah budaya dan menikmati ketenangan spiritual di sekitar candi.',
-      orgName: null,
-      orgMembers: null,
-      orgPosition: null,
+      pekerjaan: 'PNS/TNI/Polri',
     },
     {
       type: 'rombongan' as const,
@@ -110,9 +105,10 @@ async function seed() {
       visitPurpose: 'Kedinasan',
       rating: 4,
       impression: 'Kunjungan kerja studi banding pengelolaan cagar budaya daerah.',
-      orgName: 'Disbudparpora Kabupaten Kediri',
+      orgName: 'Instansi Pemerintah / Dinas',
       orgMembers: 8,
       orgPosition: 'Kepala Bidang',
+      jenisOrganisasi: 'Dinas Daerah',
     }
   ];
 

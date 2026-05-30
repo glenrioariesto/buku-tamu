@@ -4,6 +4,27 @@ import React, { useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
 import CustomSelect, { Option } from '@/components/ui/CustomSelect';
 
+const JENIS_ORGANISASI_OPTIONS: Option[] = [
+  { value: 'SD / MI', label: 'SD / MI' },
+  { value: 'SMP / MTs', label: 'SMP / MTs' },
+  { value: 'SMA / SMK / MA', label: 'SMA / SMK / MA' },
+  { value: 'Perguruan Tinggi / Universitas', label: 'Perguruan Tinggi / Universitas' },
+  { value: 'Instansi Pemerintah / Dinas', label: 'Instansi Pemerintah / Dinas' },
+  { value: 'Perusahaan / Swasta', label: 'Perusahaan / Swasta' },
+  { value: 'Organisasi Keagamaan', label: 'Organisasi Keagamaan' },
+  { value: 'Komunitas / Organisasi Sosial', label: 'Komunitas / Organisasi Sosial' },
+  { value: 'Lainnya', label: 'Lainnya' },
+];
+
+const PEKERJAAN_OPTIONS: Option[] = [
+  { value: 'PNS/TNI/Polri', label: 'PNS/TNI/Polri' },
+  { value: 'Karyawan Swasta', label: 'Karyawan Swasta' },
+  { value: 'Siswa', label: 'Siswa' },
+  { value: 'Mahasiswa', label: 'Mahasiswa' },
+  { value: 'Wiraswasta', label: 'Wiraswasta' },
+  { value: '__custom__', label: 'Lainnya (tulis manual)' },
+];
+
 const VISIT_PURPOSE_OPTIONS: Option[] = [
   { label: '🌿 Wisata & Rekreasi', value: 'group1', isGroup: true },
   { label: 'Wisata Edukasi', value: 'Wisata Edukasi' },
@@ -40,10 +61,15 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
   const [rating, setRating] = useState<number>(0);
   const [impression, setImpression] = useState('');
   
+  // Occupation (personal only)
+  const [pekerjaan, setPekerjaan] = useState('');
+  const [pekerjaanCustom, setPekerjaanCustom] = useState('');
+
   // Organization details
   const [orgName, setOrgName] = useState('');
   const [orgMembers, setOrgMembers] = useState('');
   const [orgPosition, setOrgPosition] = useState('');
+  const [jenisOrganisasi, setJenisOrganisasi] = useState('');
 
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,6 +92,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
   const [provinces, setProvinces] = useState<{ id: string; name: string }[]>([]);
   const [regencies, setRegencies] = useState<{ id: string; province_id: string; name: string }[]>([]);
   const [selectedProvinceId, setSelectedProvinceId] = useState('');
+  const regenciesCacheRef = React.useRef<Map<string, { id: string; province_id: string; name: string }[]>>(new Map());
 
   const toTitleCase = (str: string) => {
     return str
@@ -93,10 +120,11 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
   }, []);
 
   // Fetch active GPS geofencing rules from DB anonymously
-  const fetchGpsRules = () => {
-    fetch('/api/auth')
-      .then((res) => res.json())
-      .then((data) => {
+  const fetchGpsRules = async () => {
+    try {
+      const res = await fetch('/api/auth');
+      if (res.ok) {
+        const data = await res.json();
         if (data.success) {
           setGpsSettings({
             enabled: data.gps_lock_enabled,
@@ -105,20 +133,29 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
             radius: data.allowed_radius_meters,
           });
         }
-      })
-      .catch((err) => console.error('Failed to load GPS config:', err));
+      }
+    } catch (err) {
+      console.error('Failed to load GPS config:', err);
+      setErrorMessage('Gagal memuat konfigurasi GPS. Beberapa fitur mungkin tidak berfungsi.');
+    }
   };
 
   useEffect(() => {
     fetchGpsRules();
   }, []);
 
-  // Load regencies dynamically
+  // Load regencies dynamically with cache
   const fetchRegenciesConfig = async (provId: string) => {
+    const cache = regenciesCacheRef.current;
+    if (cache.has(provId)) {
+      setRegencies(cache.get(provId)!);
+      return;
+    }
     try {
       const res = await fetch(`/api/regencies/${provId}.json`);
       if (res.ok) {
         const data = await res.json();
+        cache.set(provId, data);
         setRegencies(data);
       }
     } catch (err) {
@@ -224,10 +261,14 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
         visitPurpose: visitPurpose || null,
         rating: rating > 0 ? rating : null,
         impression: impression || null,
+        ...(visitorType === 'personal' ? {
+          pekerjaan: pekerjaan === '__custom__' ? pekerjaanCustom : pekerjaan || null,
+        } : {}),
         ...(visitorType === 'rombongan' ? {
-          orgName,
+          orgName: orgName,
           orgMembers: Number(orgMembers),
           orgPosition: orgPosition || null,
+          jenisOrganisasi: jenisOrganisasi || null,
         } : {})
       };
 
@@ -331,19 +372,46 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
         {/* IDENTITAS PENGUNJUNG */}
         <div className="tamu-section">
           <div className="tamu-section-title">Identitas Pengunjung</div>
-          <div className="tamu-row2">
-            <div className="tamu-field">
-              <label htmlFor="name">Nama Lengkap <span className="tamu-req">*</span></label>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onBlur={() => setTouched(prev => ({ ...prev, name: true }))}
-                placeholder="Nama lengkap Anda..."
-                className={`tamu-input ${touched.name && !name.trim() ? 'error' : ''}`}
+          <div className="tamu-field">
+            <label htmlFor="name">Nama Lengkap <span className="tamu-req">*</span></label>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={() => setTouched(prev => ({ ...prev, name: true }))}
+              placeholder="Nama lengkap Anda..."
+              className={`tamu-input ${touched.name && !name.trim() ? 'error' : ''}`}
+            />
+          </div>
+          {visitorType === 'personal' && (
+            <div className="tamu-field animate-fade-in">
+              <label htmlFor="pekerjaan">Pekerjaan</label>
+              <CustomSelect
+                id="pekerjaan"
+                value={pekerjaan}
+                onChange={(val) => {
+                  setPekerjaan(val);
+                  if (val !== '__custom__') setPekerjaanCustom('');
+                }}
+                options={PEKERJAAN_OPTIONS}
+                placeholder="-- Pilih Pekerjaan --"
               />
+              {pekerjaan === '__custom__' && (
+                <div className="animate-fade-in">
+                  <input
+                    type="text"
+                    value={pekerjaanCustom}
+                    onChange={(e) => setPekerjaanCustom(e.target.value)}
+                    placeholder="Tulis pekerjaan Anda..."
+                    className="tamu-input mt-2"
+                    autoFocus
+                  />
+                </div>
+              )}
             </div>
+          )}
+          <div className="tamu-row2">
             <div className="tamu-field">
               <label htmlFor="gender">Jenis Kelamin</label>
               <CustomSelect 
@@ -357,17 +425,17 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
                 placeholder="-- Pilih --"
               />
             </div>
-          </div>
-          <div className="tamu-field">
-            <label htmlFor="phone">No. HP / WhatsApp</label>
-            <input
-              type="tel"
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="08xx-xxxx-xxxx (opsional)"
-              className="tamu-input"
-            />
+            <div className="tamu-field">
+              <label htmlFor="phone">No. HP / WhatsApp</label>
+              <input
+                type="tel"
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="08xx-xxxx-xxxx (opsional)"
+                className="tamu-input"
+              />
+            </div>
           </div>
         </div>
 
@@ -375,17 +443,29 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
         {visitorType === 'rombongan' && (
           <div className="tamu-section animate-fade-in">
             <div className="tamu-section-title">Data Organisasi / Rombongan</div>
+
+            <div className="tamu-field">
+              <label htmlFor="orgName">Nama Organisasi / Instansi <span className="tamu-req">*</span></label>
+              <input
+                type="text"
+                id="orgName"
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+                onBlur={() => setTouched(prev => ({ ...prev, orgName: true }))}
+                placeholder="Contoh: SD Negeri Rancaekek, UNBRA..."
+                className={`tamu-input ${touched.orgName && !orgName.trim() ? 'error' : ''}`}
+              />
+            </div>
+
             <div className="tamu-row2">
               <div className="tamu-field">
-                <label htmlFor="orgName">Nama Organisasi / Instansi <span className="tamu-req">*</span></label>
-                <input
-                  type="text"
-                  id="orgName"
-                  value={orgName}
-                  onChange={(e) => setOrgName(e.target.value)}
-                  onBlur={() => setTouched(prev => ({ ...prev, orgName: true }))}
-                  placeholder="Nama organisasi..."
-                  className={`tamu-input ${touched.orgName && !orgName.trim() ? 'error' : ''}`}
+                <label htmlFor="jenisOrganisasi">Jenis Organisasi</label>
+                <CustomSelect
+                  id="jenisOrganisasi"
+                  value={jenisOrganisasi}
+                  onChange={(val) => setJenisOrganisasi(val)}
+                  options={JENIS_ORGANISASI_OPTIONS}
+                  placeholder="-- Pilih Jenis --"
                 />
               </div>
               <div className="tamu-field">
@@ -402,6 +482,7 @@ export default function CheckInForm({ onSuccess }: CheckInFormProps) {
                 />
               </div>
             </div>
+
             <div className="tamu-field">
               <label htmlFor="orgPosition">Jabatan / Posisi</label>
               <input

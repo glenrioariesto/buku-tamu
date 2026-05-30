@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAdminStore, Guest } from '@/store/useAdminStore';
 import { 
   Building, 
@@ -11,8 +11,7 @@ import {
   Search, 
   Trash2, 
   Edit3, 
-  X,
-  HelpCircle
+  X
 } from 'lucide-react';
 
 const VISIT_PURPOSES = [
@@ -26,10 +25,26 @@ export default function VisitorTable() {
   const guests = useAdminStore((s) => s.guests);
   const searchQuery = useAdminStore((s) => s.searchQuery);
   const isLoading = useAdminStore((s) => s.isLoading);
+  const currentPage = useAdminStore((s) => s.currentPage);
+  const totalPages = useAdminStore((s) => s.totalPages);
+  const totalGuests = useAdminStore((s) => s.totalGuests);
   const setSearchQuery = useAdminStore((s) => s.setSearchQuery);
+  const setPage = useAdminStore((s) => s.setPage);
   const fetchGuests = useAdminStore((s) => s.fetchGuests);
   const deleteGuest = useAdminStore((s) => s.deleteGuest);
   const editGuest = useAdminStore((s) => s.editGuest);
+
+  // Debounced server-side search
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchGuests(1); // go to page 1 on new search
+    }, 350);
+  };
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('id-ID', {
@@ -77,32 +92,33 @@ export default function VisitorTable() {
   const [editVisitPurpose, setEditVisitPurpose] = useState('');
   const [editRating, setEditRating] = useState<number>(0);
   const [editImpression, setEditImpression] = useState('');
+  const [editPekerjaan, setEditPekerjaan] = useState('');
+  const [editPekerjaanCustom, setEditPekerjaanCustom] = useState('');
   const [editOrgName, setEditOrgName] = useState('');
   const [editOrgMembers, setEditOrgMembers] = useState('');
   const [editOrgPosition, setEditOrgPosition] = useState('');
+  const [editJenisOrganisasi, setEditJenisOrganisasi] = useState('');
 
-  // Filter visitors based on search query
-  const filteredGuests = guests.filter((g) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      g.name.toLowerCase().includes(query) ||
-      g.city.toLowerCase().includes(query) ||
-      (g.orgName && g.orgName.toLowerCase().includes(query)) ||
-      (g.visitPurpose && g.visitPurpose.toLowerCase().includes(query))
-    );
-  });
+  const JENIS_ORGANISASI_OPTIONS = [
+    'SD / MI', 'SMP / MTs', 'SMA / SMK / MA',
+    'Perguruan Tinggi / Universitas', 'Instansi Pemerintah / Dinas',
+    'Perusahaan / Swasta', 'Organisasi Keagamaan',
+    'Komunitas / Organisasi Sosial', 'Lainnya',
+  ];
+
 
   // Export to CSV
   const exportToCSV = () => {
-    if (filteredGuests.length === 0) return;
+    if (guests.length === 0) return;
 
     const headers = [
-      'ID', 'Tipe Pengunjung', 'Nama Lengkap', 'Jenis Kelamin', 'No. HP/WA', 
-      'Asal Kota', 'Provinsi', 'Negara', 'Tujuan Kunjungan', 'Rating', 
-      'Kesan & Pesan', 'Nama Organisasi', 'Jumlah Anggota', 'Jabatan', 'Waktu Berkunjung'
+      'ID', 'Tipe Pengunjung', 'Nama Lengkap', 'Jenis Kelamin', 'No. HP/WA',
+      'Asal Kota', 'Provinsi', 'Negara', 'Pekerjaan',
+      'Tujuan Kunjungan', 'Rating', 'Kesan & Pesan',
+      'Nama Organisasi', 'Jenis Organisasi', 'Jumlah Anggota', 'Jabatan', 'Waktu Berkunjung'
     ];
 
-    const rows = filteredGuests.map((g) => [
+    const rows = guests.map((g) => [
       g.id,
       g.type === 'personal' ? 'Personal' : 'Rombongan',
       `"${g.name.replace(/"/g, '""')}"`,
@@ -111,10 +127,12 @@ export default function VisitorTable() {
       `"${g.city.replace(/"/g, '""')}"`,
       g.province || '—',
       g.country || 'Indonesia',
+      g.pekerjaan ? `"${g.pekerjaan.replace(/"/g, '""')}"` : '—',
       `"${(g.visitPurpose || '—').replace(/"/g, '""')}"`,
       g.rating || '—',
       `"${(g.impression || '—').replace(/\n/g, ' ').replace(/"/g, '""')}"`,
       g.orgName ? `"${g.orgName.replace(/"/g, '""')}"` : '—',
+      g.jenisOrganisasi ? `"${g.jenisOrganisasi.replace(/"/g, '""')}"` : '—',
       g.orgMembers || '—',
       g.orgPosition ? `"${g.orgPosition.replace(/"/g, '""')}"` : '—',
       new Date(g.createdAt).toLocaleString('id-ID')
@@ -146,9 +164,14 @@ export default function VisitorTable() {
     setEditVisitPurpose(guest.visitPurpose || '');
     setEditRating(guest.rating || 0);
     setEditImpression(guest.impression || '');
+    const pekerjaanVal = guest.pekerjaan || '';
+    const isPresetPekerjaan = ['PNS/TNI/Polri', 'Karyawan Swasta', 'Siswa', 'Mahasiswa', 'Wiraswasta'].includes(pekerjaanVal);
+    setEditPekerjaan(isPresetPekerjaan ? pekerjaanVal : (pekerjaanVal ? '__custom__' : ''));
+    setEditPekerjaanCustom(isPresetPekerjaan ? '' : pekerjaanVal);
     setEditOrgName(guest.orgName || '');
     setEditOrgMembers(guest.orgMembers ? String(guest.orgMembers) : '');
     setEditOrgPosition(guest.orgPosition || '');
+    setEditJenisOrganisasi(guest.jenisOrganisasi || '');
     setIsEditModalOpen(true);
     fetchProvincesData();
   };
@@ -163,6 +186,8 @@ export default function VisitorTable() {
       return;
     }
 
+    const finalOrgName = editOrgName;
+
     const updates: Partial<Guest> = {
       name: editName,
       city: editCity,
@@ -173,9 +198,11 @@ export default function VisitorTable() {
       visitPurpose: editVisitPurpose || null,
       rating: editRating > 0 ? editRating : null,
       impression: editImpression || null,
-      orgName: editingGuest.type === 'rombongan' ? editOrgName : null,
+      pekerjaan: editingGuest.type === 'personal' ? (editPekerjaan === '__custom__' ? editPekerjaanCustom : editPekerjaan) : null,
+      orgName: editingGuest.type === 'rombongan' ? finalOrgName : null,
       orgMembers: editingGuest.type === 'rombongan' && editOrgMembers ? Number(editOrgMembers) : null,
       orgPosition: editingGuest.type === 'rombongan' ? editOrgPosition : null,
+      jenisOrganisasi: editingGuest.type === 'rombongan' ? editJenisOrganisasi : null,
     };
 
     const success = await editGuest(editingGuest.id, updates);
@@ -213,7 +240,7 @@ export default function VisitorTable() {
 
           <button
             onClick={exportToCSV}
-            disabled={filteredGuests.length === 0}
+            disabled={guests.length === 0}
             className="px-4 py-2.5 bg-candi-white hover:bg-candi-cream border border-stone-200 hover:border-candi-gold text-candi-charcoal hover:text-candi-gold text-sm font-semibold rounded-xl transition duration-150 flex items-center gap-2 cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="size-4" />
@@ -227,14 +254,14 @@ export default function VisitorTable() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               placeholder="Cari nama, kota, organisasi..."
               className="w-full py-2.5 pl-10 pr-4 bg-candi-white border border-stone-200 rounded-xl text-sm"
             />
             <Search className="size-4 text-candi-muted absolute left-3.5 top-3.5" />
           </div>
           <div className="bg-candi-gold text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0">
-            {filteredGuests.length} Pengunjung
+            {totalGuests} Pengunjung
           </div>
         </div>
       </div>
@@ -265,7 +292,7 @@ export default function VisitorTable() {
                     </div>
                   </td>
                 </tr>
-              ) : filteredGuests.length === 0 ? (
+              ) : guests.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-candi-muted">
                     <div className="flex flex-col items-center gap-4">
@@ -279,7 +306,7 @@ export default function VisitorTable() {
                   </td>
                 </tr>
               ) : (
-                filteredGuests.map((guest, index) => (
+                guests.map((guest, index) => (
                   <tr key={guest.id} className="hover:bg-candi-cream/15 transition duration-150">
                     <td className="p-4 text-center font-semibold text-candi-muted">
                       {index + 1}
@@ -296,12 +323,22 @@ export default function VisitorTable() {
                             </span>
                           )}
                         </div>
+                        {guest.type === 'personal' && guest.pekerjaan && (
+                          <span className="text-[10px] text-candi-muted font-medium">
+                            {guest.pekerjaan}
+                          </span>
+                        )}
                         {guest.type === 'rombongan' && (
-                          <div className="flex items-center gap-1 text-xs font-semibold text-candi-gold bg-candi-gold-light/45 py-0.5 px-2 rounded-md w-fit mt-0.5 border border-candi-gold-light/60">
-                            <Building className="size-3" />
-                            <span>{guest.orgName} ({guest.orgMembers} org)</span>
-                            {guest.orgPosition && (
-                              <span className="text-[10px] text-candi-muted ml-1 italic">- {guest.orgPosition}</span>
+                          <div className="flex flex-col gap-0.5 mt-0.5">
+                            <div className="flex items-center gap-1 text-xs font-semibold text-candi-gold bg-candi-gold-light/45 py-0.5 px-2 rounded-md w-fit border border-candi-gold-light/60">
+                              <Building className="size-3" />
+                              <span>{guest.orgName} ({guest.orgMembers} org)</span>
+                              {guest.orgPosition && (
+                                <span className="text-[10px] text-candi-muted ml-1 italic">- {guest.orgPosition}</span>
+                              )}
+                            </div>
+                            {guest.jenisOrganisasi && (
+                              <span className="text-[10px] text-candi-muted ml-1">{guest.jenisOrganisasi}</span>
                             )}
                           </div>
                         )}
@@ -373,6 +410,57 @@ export default function VisitorTable() {
         </div>
       </div>
 
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between gap-4 pt-2">
+          <div className="text-xs text-candi-muted font-medium">
+            Halaman {currentPage} dari {totalPages} (total {totalGuests} tamu)
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => fetchGuests(currentPage - 1)}
+              disabled={currentPage <= 1 || isLoading}
+              className="px-3 py-1.5 bg-candi-white hover:bg-candi-cream border border-stone-200 hover:border-candi-gold text-candi-charcoal text-xs font-semibold rounded-lg transition duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              « Prev
+            </button>
+            {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+              let pageNum: number;
+              if (totalPages <= 7) {
+                pageNum = i + 1;
+              } else if (currentPage <= 4) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 3) {
+                pageNum = totalPages - 6 + i;
+              } else {
+                pageNum = currentPage - 3 + i;
+              }
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => fetchGuests(pageNum)}
+                  disabled={isLoading}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition duration-150 cursor-pointer ${
+                    pageNum === currentPage
+                      ? 'bg-candi-gold text-white shadow-sm'
+                      : 'bg-candi-white hover:bg-candi-cream border border-stone-200 text-candi-charcoal'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => fetchGuests(currentPage + 1)}
+              disabled={currentPage >= totalPages || isLoading}
+              className="px-3 py-1.5 bg-candi-white hover:bg-candi-cream border border-stone-200 hover:border-candi-gold text-candi-charcoal text-xs font-semibold rounded-lg transition duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next »
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* EDIT VISITOR DETAILS MODAL */}
       {isEditModalOpen && editingGuest && (
         <div role="presentation" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in" onClick={() => { setIsEditModalOpen(false); setEditingGuest(null); }} onKeyDown={(e) => { if (e.key === 'Escape') { setIsEditModalOpen(false); setEditingGuest(null); } }}>
@@ -405,6 +493,37 @@ export default function VisitorTable() {
                 />
               </div>
 
+              {/* Pekerjaan (personal only) */}
+              {editingGuest.type === 'personal' && (
+                <div>
+                  <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                    Pekerjaan
+                  </div>
+                  <select
+                    value={editPekerjaan}
+                    onChange={(e) => {
+                      setEditPekerjaan(e.target.value);
+                      if (e.target.value !== '__custom__') setEditPekerjaanCustom('');
+                    }}
+                    className="w-full py-2.5 px-3 bg-candi-cream/30 border border-candi-gold-light rounded-xl text-sm cursor-pointer"
+                  >
+                    <option value="">-- Pilih --</option>
+                    {['PNS/TNI/Polri', 'Karyawan Swasta', 'Siswa', 'Mahasiswa', 'Wiraswasta', '__custom__'].map((p) => (
+                      <option key={p} value={p}>{p === '__custom__' ? 'Lainnya (tulis manual)' : p}</option>
+                    ))}
+                  </select>
+                  {editPekerjaan === '__custom__' && (
+                    <input
+                      type="text"
+                      value={editPekerjaanCustom}
+                      onChange={(e) => setEditPekerjaanCustom(e.target.value)}
+                      className="w-full py-2.5 px-3 bg-white border border-candi-gold-light rounded-xl text-sm mt-2"
+                      placeholder="Tulis pekerjaan..."
+                    />
+                  )}
+                </div>
+              )}
+
               {/* Organization fields (if type === rombongan) */}
               {editingGuest.type === 'rombongan' && (
                 <div className="p-3.5 bg-candi-gold-light/15 border border-candi-gold-light/40 rounded-xl space-y-4">
@@ -417,8 +536,24 @@ export default function VisitorTable() {
                       value={editOrgName}
                       onChange={(e) => setEditOrgName(e.target.value)}
                       className="w-full py-2.5 px-3 bg-white border border-candi-gold-light rounded-xl text-sm"
+                      placeholder="Contoh: SD Negeri Rancaekek, UNBRA..."
                       required
                     />
+                  </div>
+                  <div>
+                    <div className="block text-xs font-bold text-candi-charcoal uppercase tracking-wider mb-1.5">
+                      Jenis Organisasi
+                    </div>
+                    <select
+                      value={editJenisOrganisasi}
+                      onChange={(e) => setEditJenisOrganisasi(e.target.value)}
+                      className="w-full py-2.5 px-3 bg-white border border-candi-gold-light rounded-xl text-sm cursor-pointer"
+                    >
+                      <option value="">-- Pilih --</option>
+                      {JENIS_ORGANISASI_OPTIONS.map(o => (
+                        <option key={o} value={o}>{o}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>

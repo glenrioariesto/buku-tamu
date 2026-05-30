@@ -14,10 +14,14 @@ export const guests = sqliteTable('guests', {
   rating: integer('rating'), // 1 to 5 stars
   impression: text('impression'),
   
+  // Occupation (only for personal type)
+  pekerjaan: text('pekerjaan'),
+
   // Organization / Group details (only filled if type === 'rombongan')
   orgName: text('org_name'),
   orgMembers: integer('org_members'),
   orgPosition: text('org_position'),
+  jenisOrganisasi: text('jenis_organisasi'),
   
   createdAt: integer('created_at', { mode: 'timestamp' })
     .default(sql`(strftime('%s', 'now'))`)
