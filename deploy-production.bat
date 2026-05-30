@@ -58,7 +58,10 @@ if errorlevel 1 (
 if exist src\test (
   git rm -r --cached src/test/ >nul 2>&1
   git rm --cached vitest.config.ts >nul 2>&1
-  git commit -m "chore: remove dev-only test files from production" >nul 2>&1
+  git rm --cached deploy-production.bat >nul 2>&1
+  git rm --cached scripts/migrate-turso.mjs >nul 2>&1
+  git rm -r --cached drizzle/ >nul 2>&1
+  git commit -m "chore: remove dev-only files from production" >nul 2>&1
 )
 echo       OK
 
